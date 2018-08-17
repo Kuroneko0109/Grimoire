@@ -1,0 +1,124 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+#include <libgrimoire/config/config.h>
+#include <libgrimoire/common/common.h>
+#include <libgrimoire/system/file.h>
+#include <libgrimoire/datastructure/list.h>
+
+config_element_t * create_config_element(char * key, char * val)
+{
+	config_element_t * element = malloc(sizeof(config_element_t));
+	strcpy(element->key, key);
+	strcpy(element->val, val);
+	return element;
+}
+
+typedef struct priv_config priv_config_t;
+
+struct priv_config {
+	config_t public;
+
+	void (*parser)(config_t * this);
+
+	file_t * file;
+	list_t * list;
+
+	char buffer[0];
+};
+
+void config_parser(config_t * config)
+{
+	priv_config_t * priv = (priv_config_t *)config;
+	char str[128];
+
+	char key[32];
+	char val[64];
+
+	char * ptr = priv->buffer;
+	int i;
+	
+	config_element_t * element;
+
+	ptr = strtok(priv->buffer, "\n");
+	while(ptr)
+	{
+		strcpy(str, ptr);
+		memset(key, 0, sizeof(key));
+		memset(val, 0, sizeof(val));
+
+		for(i=0;str[i]!='=';i++)
+			key[i] = str[i];	// strcpy for front '='
+		i++;	// next '='
+		strcpy(val, str+i);
+
+		if('\0' == key[0] || '\0' == val[0])
+			printf("Invalid config line(%s)\n", str);
+		else
+			priv->list->enqueue_data(priv->list, create_config_element(key, val));
+
+		ptr = strtok(NULL, "\n");
+	}
+}
+
+int config_compare_by_key(void * _s, void * _d)
+{
+	config_element_t * s = _s;
+	config_element_t * d = _d;
+	return strcmp(s->key, d->key);
+}
+
+config_element_t * config_get_value(config_t * this, char * key)
+{
+	priv_config_t * priv = (priv_config_t *)this;
+	config_element_t obj;
+	node_t * node;
+
+	strcpy(obj.key, key);
+
+	node = priv->list->find(priv->list, &obj);
+	if(node)
+		return node->get_data(node);
+
+	return NULL;
+}
+
+void * config_dump_element(void * data)
+{
+	config_element_t * element = (config_element_t *)data;
+
+	printf("key : %s, val : %s\n", element->key, element->val);
+
+	return NULL;
+}
+
+config_t * create_config(char * directory, int buffer_len)
+{
+	printf("Load Config(%s)...\n", directory);
+
+	file_t * file;
+	list_t * list;
+	config_element_t * element;
+
+	priv_config_t * private = malloc(sizeof(priv_config_t) + buffer_len);
+	config_t * public = &private->public;
+
+	private->parser = config_parser;
+	private->file = create_file(directory);
+	private->list = create_list(NULL, config_compare_by_key, config_dump_element);
+
+	file = private->file;
+	file->open(file);
+	file->read(file, private->buffer, buffer_len);
+	file->close(file);
+
+	private->parser(public);
+
+	list = private->list;
+	list->dump(list);
+
+	public->get_value = config_get_value;
+
+	return 0;
+}
