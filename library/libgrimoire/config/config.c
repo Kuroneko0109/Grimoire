@@ -73,13 +73,17 @@ config_element_t * config_get_value(config_t * this, char * key)
 {
 	priv_config_t * priv = (priv_config_t *)this;
 	config_element_t obj;
+	config_element_t * data;
 	node_t * node;
 
 	strcpy(obj.key, key);
 
 	node = priv->list->find(priv->list, &obj);
 	if(node)
-		return node->get_data(node);
+	{
+		data = node->get_data(node);
+		return data->val;
+	}
 
 	return NULL;
 }
