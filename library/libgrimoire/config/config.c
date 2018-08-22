@@ -25,6 +25,7 @@ struct priv_config {
 	file_t * file;
 	list_t * list;
 
+	int buffer_len;
 	char buffer[0];
 };
 
@@ -69,21 +70,17 @@ int config_compare_by_key(void * _s, void * _d)
 	return strcmp(s->key, d->key);
 }
 
-config_element_t * config_get_value(config_t * this, char * key)
+char * config_get_value(config_t * this, char * key)
 {
 	priv_config_t * priv = (priv_config_t *)this;
 	config_element_t obj;
-	config_element_t * data;
 	node_t * node;
 
 	strcpy(obj.key, key);
 
 	node = priv->list->find(priv->list, &obj);
 	if(node)
-	{
-		data = node->get_data(node);
-		return data->val;
-	}
+		return ((config_element_t *)node->get_data(node))->val;
 
 	return NULL;
 }
@@ -97,6 +94,21 @@ void * config_dump_element(void * data)
 	return NULL;
 }
 
+void config_reload(config_t * this)
+{
+	priv_config_t * priv = (priv_config_t *)this;
+	file_t * file;
+	list_t * list;
+
+	file = priv->file;
+	file->open(file);
+	file->read(file, priv->buffer, priv->buffer_len);
+	file->close(file);
+
+	list = priv->list;
+	list->flush(list);
+}
+
 config_t * create_config(char * directory, int buffer_len)
 {
 	printf("Load Config(%s)...\n", directory);
@@ -108,21 +120,20 @@ config_t * create_config(char * directory, int buffer_len)
 	priv_config_t * private = malloc(sizeof(priv_config_t) + buffer_len);
 	config_t * public = &private->public;
 
+	private->buffer_len = buffer_len;
 	private->parser = config_parser;
 	private->file = create_file(directory);
 	private->list = create_list(NULL, config_compare_by_key, config_dump_element);
 
-	file = private->file;
-	file->open(file);
-	file->read(file, private->buffer, buffer_len);
-	file->close(file);
+	public->get_value = config_get_value;
+	public->reload = config_reload;
+
+	public->reload(public);
 
 	private->parser(public);
 
 	list = private->list;
 	list->dump(list);
 
-	public->get_value = config_get_value;
-
-	return 0;
+	return public;
 }

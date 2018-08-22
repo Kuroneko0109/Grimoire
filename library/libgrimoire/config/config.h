@@ -13,7 +13,8 @@ struct config_element {
 typedef struct config config_t;
 
 struct config {
-	config_element_t * (*get_value)(config_t * this, char * key);
+	char * (*get_value)(config_t * this, char * key);
+	void (*reload)(config_t * this);
 };
 
 config_element_t * create_config_element(char * key, char * val);
