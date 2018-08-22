@@ -24,8 +24,7 @@ void file_creat(file_t * this)
 {
 	priv_file_t * priv = (priv_file_t *)this;
 
-	if(-1 != priv->fd)
-		;
+	creat(priv->directory, priv->permission);
 }
 
 int file_open(file_t * this)
