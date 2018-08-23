@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <libgrimoire/delivery/mailbox.h>
 #include <libgrimoire/datastructure/list.h>
 
@@ -32,6 +33,10 @@ int mailbox_input(mailbox_t * this, mail_t * mail)
 
 void mailbox_destroy(mailbox_t * this)
 {
+	priv_mailbox_t * priv = (priv_mailbox_t *)this;
+
+	priv->mail_list->destroy(priv->mail_list);
+	free(this);
 }
 
 mailbox_t * create_mailbox(char * boxname)
@@ -47,6 +52,8 @@ mailbox_t * create_mailbox(char * boxname)
 	public->input = mailbox_input;
 
 	private->mail_list = create_list(NULL, NULL, NULL);
+
+	strcpy(private->boxname, boxname);
 
 	return public;
 }

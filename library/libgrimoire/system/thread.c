@@ -47,7 +47,6 @@ void * thread_invoke(void * param)
 {
 	thread_t * this = (thread_t *)param;
 	priv_thread_t * priv = (priv_thread_t *)param;
-	list_t * task_list = priv->task_list;
 
 	while(priv->state)
 		this->execute_once(this);

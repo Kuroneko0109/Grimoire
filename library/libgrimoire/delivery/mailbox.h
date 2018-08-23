@@ -16,6 +16,7 @@ typedef struct mailbox mailbox_t;
 struct mailbox {
 	char * (*get_name)(mailbox_t * this);
 	int (*input)(mailbox_t * this, mail_t * mail);
+	mail_t * (*get_mail)(mailbox_t * this);
 	void (*destroy)(mailbox_t * this);
 };
 

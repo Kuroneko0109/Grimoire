@@ -1,4 +1,6 @@
 #include <libgrimoire/system/lock.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <pthread.h>
 
 typedef struct priv_lock priv_lock_t;

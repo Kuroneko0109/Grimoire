@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -29,6 +30,8 @@ void acceptor_set_addr_uds(acceptor_t * this, const char * addr)
 
 void acceptor_set_port_uds(acceptor_t * this, uint16_t port)
 {
+	priv_acceptor_t * priv = (priv_acceptor_t *)this;
+	printf("%s(%d) %p %d\n", __func__, __LINE__, priv, port);
 }
 
 int acceptor_open_uds(acceptor_t * this)

@@ -123,6 +123,8 @@ void peer_set_port_tcp(peer_t * this, uint16_t port)
 
 void peer_dump_tcp(peer_t * this)
 {
+	priv_peer_t * priv = (priv_peer_t *)this;
+	printf("%s(%d) %p\n", __func__, __LINE__, priv);
 }
 
 peer_t * create_peer_tcp(void)

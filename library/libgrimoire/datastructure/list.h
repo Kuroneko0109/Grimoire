@@ -9,7 +9,7 @@ typedef struct list list_t;
 struct list {
 	iterator_t * (*get_iterator)(list_t *);
 	node_t * (*find)(list_t *, void *);
-	void * (*find_data)(list_t *, node_t *);
+	void * (*find_data)(list_t *, void *);
 
 	int (*count)(list_t *);
 

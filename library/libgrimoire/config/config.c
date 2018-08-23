@@ -39,8 +39,6 @@ void config_parser(config_t * config)
 
 	char * ptr = priv->buffer;
 	int i;
-	
-	config_element_t * element;
 
 	ptr = strtok(priv->buffer, "\n");
 	while(ptr)
@@ -113,9 +111,7 @@ config_t * create_config(char * directory, int buffer_len)
 {
 	printf("Load Config(%s)...\n", directory);
 
-	file_t * file;
 	list_t * list;
-	config_element_t * element;
 
 	priv_config_t * private = malloc(sizeof(priv_config_t) + buffer_len);
 	config_t * public = &private->public;

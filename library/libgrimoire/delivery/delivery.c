@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <libgrimoire/delivery/delivery.h>
@@ -26,26 +27,23 @@ void delivery_send_to(delivery_t * this, char * boxname, mail_t * mail)
 		mailbox->input(mailbox, mail);
 	else
 	{
-		printf("Unregistered mailbox name : %s\n", boxname);
+		printf("Unregistered mailbox name %s. Mail destroyed\n", boxname);
 		free(mail);
 	}
 	boxlist->unlock(boxlist);
 }
 
-mailbox_t * delivery_takeout_mailbox(delivery_t * this, char * boxname)
-{
-	priv_delivery_t * priv = (priv_delivery_t *)this;
-	mailbox_t * mailbox;
-
-	return mailbox;
-}
-
-void delivery_put_mailbox(delivery_t * this, char * boxname)
+mailbox_t * delivery_register_mailbox(delivery_t * this, char * boxname)
 {
 	priv_delivery_t * priv = (priv_delivery_t *)this;
 	list_t * boxlist = priv->boxlist;
+	mailbox_t * mailbox = create_mailbox(boxname);
 
-	create_mailbox(boxname);
+	boxlist->lock(boxlist);
+	boxlist->enqueue_data(boxlist, mailbox);
+	boxlist->unlock(boxlist);
+
+	return mailbox;
 }
 
 void delivery_destroy(delivery_t * this)
@@ -56,10 +54,9 @@ void delivery_destroy(delivery_t * this)
 int delivery_mailbox_compare(void * src, void * dst)
 {
 	mailbox_t * srcbox = src;
-	mailbox_t * dstbox = dst;
 
 	char * src_name = srcbox->get_name(srcbox);
-	char * dst_name = dstbox->get_name(dstbox);
+	char * dst_name = dst;
 
 	return strcmp(src_name, dst_name);
 }
@@ -70,8 +67,7 @@ void __attribute__((constructor)) init_delivery(void)
 	delivery_global = malloc(sizeof(priv_delivery_t));
 
 	delivery_global->public.send_to = delivery_send_to;
-	delivery_global->public.takeout_mailbox = delivery_takeout_mailbox;
-	delivery_global->public.put_mailbox = delivery_put_mailbox;
+	delivery_global->public.register_mailbox = delivery_register_mailbox;
 	delivery_global->public.destroy = delivery_destroy;
 
 	delivery_global->boxlist = create_list(NULL, delivery_mailbox_compare, NULL);

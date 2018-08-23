@@ -32,12 +32,14 @@ int file_open(file_t * this)
 	priv_file_t * priv = (priv_file_t *)this;
 
 	if(-1 != priv->fd)
-		return;
+		return priv->fd;
 
 	if(this->exist(this))
 		this->creat(this);
 
 	priv->fd = open(priv->directory, priv->flags);
+	
+	return priv->fd;
 }
 
 void file_close(file_t * this)
@@ -71,6 +73,10 @@ void file_fsync(file_t * this)
 void file_destroy(file_t * this)
 {
 	priv_file_t * priv = (priv_file_t *)this;
+
+	this->close(this);
+	priv->lock->destroy(priv->lock);
+	free(this);
 }
 
 ssize_t file_read(file_t * this, void * dst, size_t size)

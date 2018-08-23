@@ -26,4 +26,6 @@ struct chrono {
 	void (*destroy)(chrono_t * this);
 };
 
+chrono_t * create_chrono(void);
+
 #endif

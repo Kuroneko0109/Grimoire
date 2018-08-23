@@ -120,11 +120,14 @@ void peer_set_addr_uds(peer_t * this, const char * addr_str)
 
 void peer_set_port_uds(peer_t * this, uint16_t port)
 {
-	return;
+	priv_peer_t * priv = (priv_peer_t *)this;
+	printf("%s(%d) %p %d\n", __func__, __LINE__, priv, port);
 }
 
 void peer_dump_uds(peer_t * this)
 {
+	priv_peer_t * priv = (priv_peer_t *)this;
+	printf("%s(%d) %p\n", __func__, __LINE__, priv);
 }
 
 peer_t * create_peer_uds(void)

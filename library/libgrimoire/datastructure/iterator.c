@@ -1,4 +1,5 @@
 #include <libgrimoire/datastructure/iterator.h>
+#include <unistd.h>
 #include <stdlib.h>
 
 typedef struct priv_iterator priv_iterator_t;
@@ -49,7 +50,6 @@ void * iterator_next(iterator_t * this)
 {
 	priv_iterator_t * priv = (priv_iterator_t *)this;
 	void * ret;
-	int i;
 	if(priv->index == priv->count)
 		return NULL;
 

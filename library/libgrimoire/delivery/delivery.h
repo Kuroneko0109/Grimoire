@@ -7,8 +7,7 @@ typedef struct delivery delivery_t;
 
 struct delivery {
 	void (*send_to)(delivery_t * this, char * boxname, mail_t * mail);
-	mailbox_t * (*takeout_mailbox)(delivery_t * this, char * boxname);
-	void (*put_mailbox)(delivery_t * this, mailbox_t * mailbox);
+	mailbox_t * (*register_mailbox)(delivery_t * this, char * boxname);
 	void (*destroy)(delivery_t * this);
 };
 
