@@ -21,7 +21,7 @@ struct hasher_extend {
 
 void hashlist_input_data(hashlist_t * this, void * data)
 {
-	priv_hasher_t * priv = (priv_hasher_t *)this;
+	priv_hashlist_t * priv = (priv_hashlist_t *)this;
 	int index = priv->hasher(data);
 	list_t * list = priv->list[index];
 
@@ -30,7 +30,7 @@ void hashlist_input_data(hashlist_t * this, void * data)
 
 void * hashlist_find_data(hashlist_t * this, void * sample)
 {
-	priv_hasher_t * priv = (priv_hasher_t *)this;
+	priv_hashlist_t * priv = (priv_hashlist_t *)this;
 	int index = priv->hasher(sample);
 	list_t * list = priv->list[index];
 
@@ -39,10 +39,10 @@ void * hashlist_find_data(hashlist_t * this, void * sample)
 
 hashlist_t * create_hashlist(
 		int (*hasher)(void *),
+		int hash_size,
 		void * (*method_destroyer)(void *),
 		int (*method_compare)(void *, void *),
-		void * (*method_dump)(void *),
-		int hash_size)
+		void * (*method_dump)(void *))
 {
 	priv_hashlist_t * private;
 	hashlist_t * public;
