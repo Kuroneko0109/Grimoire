@@ -6,9 +6,10 @@
 typedef struct hashlist hashlist_t;
 
 struct hashlist {
-	int (*input_data)(hashlist_t * this, void * data);
+	void (*input_data)(hashlist_t * this, void * data);
+	void * (*find_data)(hashlist_t * this, void * data);
 };
 
-hashlist_t * create_hashlist(int (*hasher)(void *), int size);
+hashlist_t * create_hashlist(int (*hasher)(void *), int hash_size);
 
 #endif

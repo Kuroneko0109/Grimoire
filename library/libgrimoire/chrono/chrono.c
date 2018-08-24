@@ -28,7 +28,7 @@ void chrono_time_slip(chrono_t * this, long long nanosec)
 	priv->time_vector += nanosec;
 }
 
-void chrono_set_period(chrono_t * this, long nanosec)
+void chrono_set_period(chrono_t * this, long long nanosec)
 {
 	priv_chrono_t * priv = (priv_chrono_t *)this;
 
