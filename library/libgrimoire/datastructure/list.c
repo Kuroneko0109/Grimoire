@@ -17,6 +17,7 @@ struct priv_list {
 
 	void * (*method_destroyer)(void *);
 	int (*method_compare)(void *, void *);
+	int (*method_sort)(void *, void *);
 	void * (*method_dump)(void *);
 
 	lock_t * lock;
@@ -226,6 +227,38 @@ int list_count(list_t * this)
 	return i;
 }
 
+void list_set_sort(list_t * this, void (*method_sort)(iterator_t *, int (*)(void *, void *)))
+{
+	priv_list_t * priv = (priv_list_t *)this;
+
+	priv->method_sort = method_sort;
+}
+
+void list_sort(list_t * this)
+{
+	priv_list_t * priv = (priv_list_t *)this;
+	iterator_t * iterator;
+	node_t * node;
+
+	int count;
+	int i;
+
+	count = this->count(this);
+	iterator = create_iterator(count);
+
+	node = priv->head;
+	for(i=0;i<count;i++)
+	{
+		iterator->set_data(iterator, node, i);
+		node = node->get_rear(node);
+	}
+
+	if(priv->method_sort)
+		priv->method_sort(iterator, priv->method_compare);
+
+	iterator->destroy(iterator);
+}
+
 list_t * create_list(
 		void * (*method_destroyer)(void *),
 		int (*method_compare)(void *, void *),
@@ -239,6 +272,7 @@ list_t * create_list(
 
 	private->method_destroyer = method_destroyer;
 	private->method_compare = method_compare;
+	private->method_sort = NULL;
 	private->method_dump = method_dump;
 	private->lock = create_lock();
 
@@ -253,6 +287,8 @@ list_t * create_list(
 	public->detach = list_detach;
 	public->lock = list_lock;
 	public->unlock = list_unlock;
+	public->set_sort = list_set_sort;
+	public->sort = list_sort;
 	public->foreach = list_foreach;
 	public->dump = list_dump;
 	public->flush = list_flush;
