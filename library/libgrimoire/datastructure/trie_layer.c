@@ -41,6 +41,12 @@ void * trie_layer_get_data(trie_layer_t * this)
 	return priv->data;
 }
 
+void trie_layer_set_data(trie_layer_t * this, void * data)
+{
+	priv_trie_layer_t * priv = (priv_trie_layer_t *)this;
+	priv->data = data;
+}
+
 void trie_layer_dump(trie_layer_t * this)
 {
 	priv_trie_layer_t * priv = (priv_trie_layer_t *)this;

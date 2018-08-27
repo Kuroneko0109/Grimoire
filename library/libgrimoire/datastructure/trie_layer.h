@@ -8,6 +8,7 @@ struct trie_layer {
 	trie_layer_t * (*get_next)(trie_layer_t * this, int index);
 	void (*set_next)(trie_layer_t * this, trie_layer_t * next, int index);
 	void * (*get_data)(trie_layer_t * this);
+	void (*set_data)(trie_layer_t * this, void * data);
 	void (*dump)(trie_layer_t * this);
 };
 
