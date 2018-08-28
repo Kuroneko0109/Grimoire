@@ -1,19 +1,22 @@
+#include <libgrimoire/datastructure/list.h>
 #include <libgrimoire/system/event.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct event event_t;
 
 struct event {
 	int fd;
-	void * (*callback)(void *);
+	void (*callback)(int);
 	char * id;
 };
 
 int event_id_compare(void * _s, void * _d)
 {
-	event_t * s = _s;
-	event_t * d = _d;
+	event_t * s = (event_t *)_s;
+	event_t * d = (event_t *)_d;
 
-	return strcmp(_s->id, _d->id);
+	return strcmp(s->id, d->id);
 }
 
 event_t * create_event(char * id, int fd, void * (*callback)(void *))
@@ -36,6 +39,7 @@ struct priv_event_ctrl {
 void * event_ctrl_watch(void * param)
 {
 	event_t * event = param;
+	event->callback(event->fd);
 }
 
 void event_ctrl_poll(event_ctrl_t * this)
@@ -46,7 +50,7 @@ void event_ctrl_poll(event_ctrl_t * this)
 	list->foreach(list, event_ctrl_watch);
 }
 
-void event_ctrl_register(event_ctrl_t * this, char * id, int fd, void * (*func)(void *))
+void event_ctrl_register_event(event_ctrl_t * this, char * id, int fd, void (*func)(int *))
 {
 	priv_event_ctrl_t * priv = (priv_event_ctrl_t *)this;
 	list_t * list = priv->event_list;
@@ -64,13 +68,15 @@ priv_event_ctrl_t * event_ctrl_global;
 void __attribute__((constructor)) init_event_ctrl_global(void)
 {
 	event_ctrl_global = malloc(sizeof(priv_event_ctrl_t));
+	priv_event_ctrl_t * private;
+	event_ctrl_t * public;
 
 	private = event_ctrl_global;
 	public = &event_ctrl_global->public;
 
 	private->event_list = create_list(NULL, NULL, NULL);
 
-	public->register = event_ctrl_register;
+	public->register_event = event_ctrl_register_event;
 
 	return public;
 }
