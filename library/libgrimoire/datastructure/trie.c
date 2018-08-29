@@ -15,10 +15,10 @@ struct priv_trie {
 	trie_layer_t * root;
 };
 
-int trie_insert(trie_t * this, void * data, int data_len)
+int trie_insert(trie_t * this, void * src, int src_len, void * data)
 {
 	priv_trie_t * priv = (priv_trie_t *)this;
-	uint8_t * byte = data;
+	uint8_t * byte = src;
 	trie_layer_t * layer;
 	trie_layer_t * next_layer;
 	int i;
@@ -26,7 +26,7 @@ int trie_insert(trie_t * this, void * data, int data_len)
 	this->dump(this);
 
 	layer = priv->root;
-	for(i=0;i<data_len;i++)
+	for(i=0;i<src_len;i++)
 	{
 		next_layer = layer->get_next(layer, priv->mapping_table[byte[i]]);
 		if(NULL == next_layer)
@@ -38,24 +38,26 @@ int trie_insert(trie_t * this, void * data, int data_len)
 		layer = next_layer;
 	}
 
+	layer->set_data(layer, data);
+
 	this->dump(this);
 
 	return 0;
 }
 
-int trie_remove(trie_t * this, void * data, int data_len)
+int trie_remove(trie_t * this, void * src, int src_len)
 {
 	priv_trie_t * priv = (priv_trie_t *)this;
-	uint8_t * byte = data;
+	uint8_t * byte = src;
 	int i;
 
 	return 0;
 }
 
-void * trie_find(trie_t * this, void * data, int data_len)
+void * trie_find(trie_t * this, void * src, int src_len)
 {
 	priv_trie_t * priv = (priv_trie_t *)this;
-	uint8_t * byte = data;
+	uint8_t * byte = src;
 	int i;
 
 	return NULL;

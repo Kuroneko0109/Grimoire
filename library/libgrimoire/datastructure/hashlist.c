@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <unistd.h>
 #include <libgrimoire/datastructure/hashlist.h>
 #include <libgrimoire/datastructure/list.h>
 
@@ -9,7 +11,7 @@ struct priv_hashlist {
 	int (*hasher)(void * data);
 	int hash_size;
 
-	list_t * list[0];
+	list_t * chain[0];
 };
 
 /*
@@ -23,18 +25,18 @@ void hashlist_input_data(hashlist_t * this, void * data)
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
 	int index = priv->hasher(data);
-	list_t * list = priv->list[index];
+	list_t * chain = priv->chain[index];
 
-	list->enqueue_data(list, data);
+	chain->enqueue_data(chain, data);
 }
 
 void * hashlist_find_data(hashlist_t * this, void * sample)
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
 	int index = priv->hasher(sample);
-	list_t * list = priv->list[index];
+	list_t * chain = priv->chain[index];
 
-	return list->find_data(list, sample);
+	return chain->find_data(chain, sample);
 }
 
 hashlist_t * create_hashlist(
@@ -58,7 +60,7 @@ hashlist_t * create_hashlist(
 	public->find_data = hashlist_find_data;
 
 	for(i=0;i<hash_size;i++)
-		private->list[i] = create_list(method_destroyer, method_compare, method_dump);
+		private->chain[i] = create_list(method_destroyer, method_compare, method_dump);
 
 	return public;
 }
