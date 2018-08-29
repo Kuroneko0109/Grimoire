@@ -77,6 +77,7 @@ void __attribute__((constructor)) init_event_ctrl_global(void)
 	private->event_list = create_list(NULL, NULL, NULL);
 
 	public->register_event = event_ctrl_register_event;
+	public->event_ctrl_poll = event_ctrl_poll;
 
 	return public;
 }
