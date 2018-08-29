@@ -109,5 +109,7 @@ acceptor_t * create_acceptor_tcp(void)
 	public->accept_peer = acceptor_accept_peer_tcp;
 	public->destroy = acceptor_destroy_tcp;
 
+	public->set_addr(public, "0.0.0.0");
+
 	return public;
 }
