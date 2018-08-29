@@ -109,9 +109,8 @@ void peer_set_addr_tcp(peer_t * this, const char * addr_str)
 {
 	priv_peer_t * priv = (priv_peer_t *)this;
 
-	memset(&priv->addr_in, 0, sizeof(struct sockaddr_in));
 	priv->addr_in.sin_family = AF_INET;
-	priv->addr_in.sin_addr.s_addr= inet_addr(addr_str);
+	priv->addr_in.sin_addr.s_addr = inet_addr(addr_str);
 }
 
 void peer_set_port_tcp(peer_t * this, uint16_t port)
@@ -152,4 +151,3 @@ peer_t * create_peer_tcp(void)
 
 	return public;
 }
-
