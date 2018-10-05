@@ -1,4 +1,4 @@
-BUILD_DIR = grid common config datastructure system delivery chrono
+BUILD_DIR = grid common config datastructure system delivery chrono security
 
 all : $(BUILD_DIR)
 
