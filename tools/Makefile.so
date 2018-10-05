@@ -10,6 +10,7 @@ all :
 	$(AR) -x $(OUTPUT_GLOBAL)/grimoire
 	$(CC) $(CFLAGS) *.o
 	@sudo cp $(SHARED_LIB) /usr/lib
+	@sudo rm /usr/lib/$(SHARED_LIBNAME_GLOBAL)
 	@sudo ln -s /usr/lib/$(SHARED_LIB) /usr/lib/$(SHARED_LIBNAME_GLOBAL)
 
 .PHONY : all
