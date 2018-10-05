@@ -22,13 +22,12 @@ struct peer {
 	void (*set_nblk)(peer_t * this);
 	void (*dump)(peer_t * this);
 	void (*destroy)(peer_t * this);
-
-	void (*mode_stream)(peer_t * this);
 };
 // client_addr needed
 
 peer_t * create_peer(int af);
 peer_t * create_peer_tcp(void);
 peer_t * create_peer_uds(void);
+peer_t * create_peer_ssl(void);
 
 #endif

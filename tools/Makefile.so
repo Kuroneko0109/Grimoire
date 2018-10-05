@@ -4,13 +4,16 @@ SHARED_LIBVER_MINOR = 0.0
 SHARED_LIB = $(SHARED_LIBNAME_GLOBAL).$(SHARED_LIBVER_MAJOR)
 SHARED_LIBFILE = $(SHARED_LIB).$(SHARED_LIBVER_MINOR)
 
-CFLAGS = -shared -Wl,-soname,$(SHARED_LIB) -o $(SHARED_LIB) -lc
+CFLAGS = -shared -Wl,-soname,$(SHARED_LIB) -o $(SHARED_LIB)
+LDFLAGS = -lc -lssl
 
 all :
 	$(AR) -x $(OUTPUT_GLOBAL)/grimoire
-	$(CC) $(CFLAGS) *.o
+	$(CC) $(CFLAGS) *.o $(LDFLAGS)
+	@echo "install shared library into /usr/lib"
+	@sudo rm -f /usr/lib/$(SHARED_LIB)
 	@sudo cp $(SHARED_LIB) /usr/lib
-	@sudo rm /usr/lib/$(SHARED_LIBNAME_GLOBAL)
+	@sudo rm -f /usr/lib/$(SHARED_LIBNAME_GLOBAL)
 	@sudo ln -s /usr/lib/$(SHARED_LIB) /usr/lib/$(SHARED_LIBNAME_GLOBAL)
 
 .PHONY : all
