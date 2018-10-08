@@ -5,7 +5,7 @@ SHARED_LIB = $(SHARED_LIBNAME_GLOBAL).$(SHARED_LIBVER_MAJOR)
 SHARED_LIBFILE = $(SHARED_LIB).$(SHARED_LIBVER_MINOR)
 
 CFLAGS = -shared -Wl,-soname,$(SHARED_LIB) -o $(SHARED_LIB)
-LDFLAGS = -lc -lssl
+LDFLAGS = -lc -lssl -lcrypt
 
 all :
 	$(AR) -x $(OUTPUT_GLOBAL)/grimoire

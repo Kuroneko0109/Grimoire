@@ -10,7 +10,7 @@ typedef struct tls_server tls_server_t;
 struct tls_server {
 	tls_peer_t * (*accept)(tls_server_t * this);
 
-	void (*open)(tls_server_t * this);
+	int (*open)(tls_server_t * this);
 	void (*close)(tls_server_t * this);
 
 	void (*set_addr)(tls_server_t * this, const char * addr);
