@@ -114,9 +114,13 @@ tls_server_t * create_tls_server(config_t * config)
 		printf("Server KEY Load : %s\n", SSL_CTX_use_PrivateKey_file(private->ctx, value, SSL_FILETYPE_PEM)?"ok":"fail");
 		printf("Server KEY Verify : %s\n", SSL_CTX_check_private_key(private->ctx)?"ok":"fail");
 
-		value = config->get_value(config, "port");
+		value = config->get_value(config, "tls_server_port");
+		if(NULL == value)
+			value = "25252";
 		public->set_port(public, (uint16_t)atoi(value));
-		value = config->get_value(config, "addr");
+		value = config->get_value(config, "tls_server_addr");
+		if(NULL == value)
+			value = "0.0.0.0";
 		public->set_addr(public, value);
 	}
 
