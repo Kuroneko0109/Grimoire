@@ -9,6 +9,11 @@ typedef struct dh dh_t;
 
 struct dh {
 	void (*set_group)(dh_t * this, int group);
+
+	void (*g_x_mod)(dh_t * this);
+	void (*g_xy_mod)(dh_t * this, mpz_t g_y);
+	mpz_t * (*get_g_x_mod)(dh_t * this);
+
 	void (*rand_init)(dh_t * this);
 	void (*rand)(dh_t * this);
 	void * (*get_key)(dh_t * this);

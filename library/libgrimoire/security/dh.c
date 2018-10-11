@@ -1,4 +1,6 @@
 #include <gmp.h>
+#include <stdint.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <libgrimoire/security/dh.h>
@@ -36,7 +38,9 @@ struct priv_dh {
 
 	/* RNG */
 	gmp_randstate_t rng_stat;
-	mpz_t rn;
+
+	mpz_t gx_modp;
+	mpz_t gxy_modp;
 };
 
 void dh_set_group(dh_t * this, int group)
@@ -52,16 +56,16 @@ void dh_set_group(dh_t * this, int group)
 
 	mpz_clear(priv->generator);
 	mpz_clear(priv->prime);
-	mpz_clear(priv->generator);
+	mpz_clear(priv->exp);
 	mpz_init(priv->generator);
 	mpz_init(priv->prime);
-	mpz_init(priv->generator);
+	mpz_init(priv->exp);
 
 	mpz_set_ui(priv->generator, 2);
 	mpz_set_str(priv->prime, group_info->modp_str, 16);
 	printf("Selected group : %d\nPrime : ", group);
 	mpz_out_str(stdout, 16, priv->prime);
-	printf("\n");
+	printf("\n\n");
 	priv->group = group;
 }
 
@@ -69,9 +73,14 @@ void dh_rand_init(dh_t * this)
 {
 	priv_dh_t * priv = (priv_dh_t *)this;
 
-	srand(time(NULL));
+	uint32_t rnd;
+	int fd;
+	fd = open("/dev/random", O_RDONLY);
+	read(fd, &rnd, 4);
+	close(fd);
+
 	gmp_randinit_default(priv->rng_stat);
-	gmp_randseed_ui(priv->rng_stat, rand());
+	gmp_randseed_ui(priv->rng_stat, rnd);
 }
 
 void dh_rand(dh_t * this)
@@ -79,10 +88,39 @@ void dh_rand(dh_t * this)
 	priv_dh_t * priv = (priv_dh_t *)this;
 	dh_param_t * group_info = &priv->group_info[priv->group];
 
-	mpz_urandomb(priv->rn, priv->rng_stat, group_info->bits);
-	printf("RN : ");
-	mpz_out_str(stdout, 16, priv->rn);
-	printf("\n");
+	mpz_urandomb(priv->exp, priv->rng_stat, group_info->bits);
+	printf("EXP : ");
+	mpz_out_str(stdout, 16, priv->exp);
+	printf("\n\n");
+}
+
+void dh_g_x_mod(dh_t * this)
+{
+	priv_dh_t * priv = (priv_dh_t *)this;
+
+	mpz_powm(priv->gx_modp, priv->generator, priv->exp, priv->prime);
+
+	printf("g^x mod p : ");
+	mpz_out_str(stdout, 16, priv->gx_modp);
+	printf("\n\n");
+}
+
+mpz_t * dh_g_xy_mod(dh_t * this, mpz_t gy)
+{
+	priv_dh_t * priv = (priv_dh_t *)this;
+
+	mpz_powm(priv->gxy_modp, gy, priv->exp, priv->prime);
+
+	printf("g^xy mod p : ");
+	mpz_out_str(stdout, 16, priv->gxy_modp);
+	printf("\n\n");
+}
+
+mpz_t * dh_get_g_x_mod(dh_t * this)
+{
+	priv_dh_t * priv = (priv_dh_t *)this;
+
+	return &priv->gx_modp;
 }
 
 dh_t * create_dh(int group)
@@ -99,10 +137,16 @@ dh_t * create_dh(int group)
 	public->rand_init = dh_rand_init;
 	public->rand = dh_rand;
 
+	public->g_x_mod = dh_g_x_mod;
+	public->g_xy_mod = dh_g_xy_mod;
+
+	public->get_g_x_mod = dh_get_g_x_mod;
+
 	mpz_init(private->prime);
 	mpz_init(private->generator);
 	mpz_init(private->exp);
-	mpz_init(private->rn);
+	mpz_init(private->gx_modp);
+	mpz_init(private->gxy_modp);
 
 	public->rand_init(public);
 	public->set_group(public, group);
