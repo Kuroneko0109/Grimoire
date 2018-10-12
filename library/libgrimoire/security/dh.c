@@ -5,6 +5,19 @@
 #include <stdlib.h>
 #include <libgrimoire/security/dh.h>
 
+/*
+ * Alice : Select Primary(p), Select Generator(g), Select random EXP(ea)
+ * Bob : Select Primary(p), Select Generator(g), Select random EXP(eb)
+ * 
+ * DH Group 14. Shared Generator, Primary.
+ *
+ * Alice : a = g^ea mod p, send this value to bob
+ * Bob : b = g^eb mod p, send this value to alice.
+ *
+ * Alice : Calculate b^ea mod p.
+ * Bob : Calculate a^eb mod p.
+ */
+
 typedef struct dh_param dh_param_t;
 
 struct dh_param {
