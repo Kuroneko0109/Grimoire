@@ -83,17 +83,12 @@ peer_t * acceptor_accept_peer_tcp(acceptor_t * this)
 	int fd;
 	peer_t * peer = NULL;
 
-	printf("%s(%d)\n", __func__, __LINE__);
 	fd = this->accept(this);
-	printf("%s(%d)\n", __func__, __LINE__);
 	if(-1 == fd)
 		return peer;
 
-	printf("%s(%d)\n", __func__, __LINE__);
 	peer = create_peer_tcp();
-	printf("%s(%d)\n", __func__, __LINE__);
 	peer->set_fd(peer, fd);
-	printf("%s(%d)\n", __func__, __LINE__);
 
 	return peer;
 }

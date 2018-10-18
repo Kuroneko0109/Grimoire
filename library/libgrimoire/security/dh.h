@@ -22,6 +22,8 @@ struct dh {
 	void * (*clear)(dh_t * this);
 
 	void * (*export)(dh_t * this, size_t * data_size);
+
+	void (*dump)(dh_t * this);
 };
 
 dh_t * create_dh(int group);

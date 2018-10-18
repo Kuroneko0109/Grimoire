@@ -108,9 +108,6 @@ void dh_rand(dh_t * this)
 	dh_param_t * group_info = &priv->group_info[priv->group];
 
 	mpz_urandomb(priv->exp, priv->rng_stat, group_info->bits);
-	printf("EXP : ");
-	mpz_out_str(stdout, 16, priv->exp);
-	printf("\n\n");
 }
 
 void dh_g_x_mod(dh_t * this)
@@ -118,10 +115,6 @@ void dh_g_x_mod(dh_t * this)
 	priv_dh_t * priv = (priv_dh_t *)this;
 
 	mpz_powm(priv->gx_modp, priv->generator, priv->exp, priv->prime);
-
-	printf("g^x mod p : ");
-	mpz_out_str(stdout, 16, priv->gx_modp);
-	printf("\n\n");
 }
 
 mpz_t * dh_g_xy_mod(dh_t * this, mpz_t gy)
@@ -130,9 +123,7 @@ mpz_t * dh_g_xy_mod(dh_t * this, mpz_t gy)
 
 	mpz_powm(priv->gxy_modp, gy, priv->exp, priv->prime);
 
-	printf("g^xy mod p : ");
-	mpz_out_str(stdout, 16, priv->gxy_modp);
-	printf("\n\n");
+	return &priv->gxy_modp;
 }
 
 mpz_t * dh_get_g_x_mod(dh_t * this)
@@ -151,32 +142,24 @@ void * dh_export(dh_t * this, size_t * size)
 
 	bits = mpz_sizeinbase(priv->gxy_modp, 2);
 	bytes = bits/8;
-	return mpz_export(NULL, size, 1, 1, 1, 0, priv->gxy_modp);
+
+	if(bits)
+		return mpz_export(NULL, size, 1, 1, 1, 0, priv->gx_modp);
+
+	return NULL;
 }
 
-void dh_test(priv_dh_t * dh)
+void dh_dump(dh_t * this)
 {
-	int base = 2;
-	int bits;
-	int bytes;
-
-	uint8_t * data;
-	size_t cnt;
-
-	bits = mpz_sizeinbase(dh->prime, 2);
-	printf("sizeinbase : %d\n", bits);
-
-	bytes = bits/8;
-
-	data = mpz_export(NULL, &cnt, 1, 1, 1, 0, dh->prime);
-
-	printf("cnt : %lu, %d\n", cnt, cnt * 8);
-
-	int i;
-
-	for(i=0;i<bytes;i++)
-		printf("%02x", data[i]);
-
+	priv_dh_t * priv = (priv_dh_t *)this;
+	printf("EXP : ");
+	mpz_out_str(stdout, 16, priv->exp);
+	printf("\n");
+	printf("g^x mod p : ");
+	mpz_out_str(stdout, 16, priv->gx_modp);
+	printf("\n");
+	printf("g^xy mod p : ");
+	mpz_out_str(stdout, 16, priv->gxy_modp);
 	printf("\n");
 }
 
@@ -208,8 +191,7 @@ dh_t * create_dh(int group)
 
 	public->rand_init(public);
 	public->set_group(public, group);
-
-//	dh_test(private);
+	public->dump = dh_dump;
 
 	return public;
 }

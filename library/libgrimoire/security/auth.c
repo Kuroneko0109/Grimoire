@@ -31,25 +31,21 @@ struct priv_auth {
 
 int auth_verify_peer(auth_t * this, peer_t * peer)
 {
-	return 0;
 	priv_auth_t * priv = (priv_auth_t *)this;
 	dh_t * dh = priv->dh;
 
 	size_t gx_size;
-	uint8_t * gx_modp;
+	uint8_t * gx_modp = NULL;
 
 	dh->rand(dh);
 	dh->g_x_mod(dh);
-	dh->get_g_x_mod(dh);
 
 	gx_modp = (uint8_t *)dh->export(dh, &gx_size);
 
-	int i;
-	for(i=0;i<gx_size;i++)
-		printf("%02x", gx_modp[i]);
-	printf("\n");
+	dh->dump(dh);
 
-	free(gx_modp);
+	if(gx_modp)
+		free(gx_modp);
 
 	return 0;
 }
@@ -68,9 +64,11 @@ auth_t * create_auth(void)
 	private = malloc(sizeof(priv_auth_t));
 	public = &private->public;
 
-	private->dh = create_dh(14);
+	private->dh = create_dh(5);
 	public->set_psk = auth_set_psk;
 	public->verify_peer = auth_verify_peer;
+
+	private->dh->rand_init(private->dh);
 
 	return public;
 }
