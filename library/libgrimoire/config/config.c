@@ -98,13 +98,18 @@ void config_reload(config_t * this)
 	file_t * file;
 	list_t * list;
 
+	memset(priv->buffer, 0, priv->buffer_len);
+
 	file = priv->file;
 	file->open(file);
 	file->read(file, priv->buffer, priv->buffer_len);
+	printf("priv->buffer : %s", priv->buffer);
 	file->close(file);
 
 	list = priv->list;
 	list->flush(list);
+
+	priv->parser(this);
 }
 
 config_t * create_config(char * directory, int buffer_len)
@@ -120,6 +125,7 @@ config_t * create_config(char * directory, int buffer_len)
 	private->parser = config_parser;
 	private->file = create_file(directory);
 	private->list = create_list(NULL, config_compare_by_key, config_dump_element);
+	memset(private->buffer, 0, private->buffer_len);
 
 	public->get_value = config_get_value;
 	public->reload = config_reload;

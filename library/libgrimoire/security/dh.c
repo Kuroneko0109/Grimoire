@@ -28,6 +28,12 @@ struct dh_param {
 };
 
 const dh_param_t dh_param[32] = {
+	[5] = {
+		.modp_str = MODP1536_STR,
+		.bits = 1536,
+		.bytes = 1536/8,
+		.supported = 1,
+	},
 	[14] = {
 		.modp_str = MODP2048_STR,
 		.bits = 2048,
@@ -136,6 +142,44 @@ mpz_t * dh_get_g_x_mod(dh_t * this)
 	return &priv->gx_modp;
 }
 
+void * dh_export(dh_t * this, size_t * size)
+{
+	priv_dh_t * priv = (priv_dh_t *)this;
+	int bits;
+	int bytes;
+	int base;
+
+	bits = mpz_sizeinbase(priv->gxy_modp, 2);
+	bytes = bits/8;
+	return mpz_export(NULL, size, 1, 1, 1, 0, priv->gxy_modp);
+}
+
+void dh_test(priv_dh_t * dh)
+{
+	int base = 2;
+	int bits;
+	int bytes;
+
+	uint8_t * data;
+	size_t cnt;
+
+	bits = mpz_sizeinbase(dh->prime, 2);
+	printf("sizeinbase : %d\n", bits);
+
+	bytes = bits/8;
+
+	data = mpz_export(NULL, &cnt, 1, 1, 1, 0, dh->prime);
+
+	printf("cnt : %lu, %d\n", cnt, cnt * 8);
+
+	int i;
+
+	for(i=0;i<bytes;i++)
+		printf("%02x", data[i]);
+
+	printf("\n");
+}
+
 dh_t * create_dh(int group)
 {
 	priv_dh_t * private;
@@ -149,6 +193,7 @@ dh_t * create_dh(int group)
 	public->set_group = dh_set_group;
 	public->rand_init = dh_rand_init;
 	public->rand = dh_rand;
+	public->export = dh_export;
 
 	public->g_x_mod = dh_g_x_mod;
 	public->g_xy_mod = dh_g_xy_mod;
@@ -163,6 +208,8 @@ dh_t * create_dh(int group)
 
 	public->rand_init(public);
 	public->set_group(public, group);
+
+//	dh_test(private);
 
 	return public;
 }

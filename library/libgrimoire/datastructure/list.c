@@ -210,9 +210,15 @@ void list_flush(list_t * this)
 {
 	priv_list_t * priv = (priv_list_t *)this;
 	node_t * node;
+	node_t * tmp;
 
-	for(node=priv->head;node;node=node->get_rear(node))
-		node->destroy(node);
+	node = priv->head;
+	while(node)
+	{
+		tmp = node;
+		node = node->get_rear(node);
+		tmp->destroy(tmp);
+	}
 }
 
 int list_count(list_t * this)
@@ -269,6 +275,9 @@ list_t * create_list(
 
 	private = malloc(sizeof(priv_list_t));
 	public = &private->public;
+
+	private->head = NULL;
+	private->tail = NULL;
 
 	private->method_destroyer = method_destroyer;
 	private->method_compare = method_compare;
