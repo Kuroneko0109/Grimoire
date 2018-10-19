@@ -13,7 +13,7 @@ struct dh {
 	void (*set_group)(dh_t * this, int group);
 
 	void (*g_x_mod)(dh_t * this);
-	void (*g_xy_mod)(dh_t * this, mpz_t g_y);
+	void (*g_xy_mod)(dh_t * this, void * chunk);
 	mpz_t * (*get_g_x_mod)(dh_t * this);
 
 	void (*rand_init)(dh_t * this);

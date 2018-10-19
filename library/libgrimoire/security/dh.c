@@ -117,9 +117,15 @@ void dh_g_x_mod(dh_t * this)
 	mpz_powm(priv->gx_modp, priv->generator, priv->exp, priv->prime);
 }
 
-mpz_t * dh_g_xy_mod(dh_t * this, mpz_t gy)
+mpz_t * dh_g_xy_mod(dh_t * this, void * chunk)
 {
 	priv_dh_t * priv = (priv_dh_t *)this;
+	dh_param_t * group_info = &priv->group_info[priv->group];
+
+	mpz_t gy;
+	mpz_init(gy);
+
+	mpz_import(gy, group_info->bytes, 1, 1, 0, 0, chunk);
 
 	mpz_powm(priv->gxy_modp, gy, priv->exp, priv->prime);
 
@@ -138,7 +144,6 @@ void * dh_export(dh_t * this, size_t * size)
 	priv_dh_t * priv = (priv_dh_t *)this;
 	int bits;
 	int bytes;
-	int base;
 
 	bits = mpz_sizeinbase(priv->gxy_modp, 2);
 	bytes = bits/8;
