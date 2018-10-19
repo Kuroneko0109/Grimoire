@@ -10,8 +10,8 @@ struct sa {
 	int (*encrypt)(sa_t * this, void * dst, void * src, int len);
 	int (*decrypt)(sa_t * this, void * dst, void * src, int len);
 
-	void (*set_akey)(sa_t * this, uint8_t * key);
-	int (*sign)(sa_t * this);
+	void (*set_akey)(sa_t * this, uint8_t * key, int klen);
+	int (*sign)(sa_t * this, void * dst, void * src, int len);
 
 	void (*destroy)(sa_t * this);
 };

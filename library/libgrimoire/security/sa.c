@@ -5,6 +5,7 @@
 
 #include <openssl/err.h>
 #include <openssl/evp.h>
+#include <openssl/hmac.h>
 
 typedef struct cipher_info cipher_info_t;
 
@@ -17,9 +18,7 @@ struct priv_sa {
 	uint8_t iv[32];
 	uint8_t ekey[32];
 
-	EVP_MD_CTX * actx;
-	EVP_MD * md;
-	uint8_t akey[32];
+	uint8_t akey[128];
 };
 
 void sa_set_ekey(sa_t * this, uint8_t * iv, int ivlen, uint8_t * key, int klen)
@@ -62,20 +61,26 @@ int sa_decrypt(sa_t * this, void * dst, void * src, int len)
 void sa_set_akey(sa_t * this, uint8_t * key, int klen)
 {
 	priv_sa_t * priv = (priv_sa_t *)this;
-	priv->md = EVP_get_digestbyname("SHA256");
 
 	memcpy(priv->akey, key, klen);
-
-	EVP_DigestInit_ex(priv->actx, priv->md, NULL);
-	EVP_DigestSignInit(priv->actx, NULL, priv->md, NULL, priv->akey);
 }
 
-void sa_sign(sa_t * this)
+void sa_sign(sa_t * this, void * dst, void * src, int len)
 {
 	priv_sa_t * priv = (priv_sa_t *)this;
+	int digest_len;
+	uint8_t * hmac;
 
-	//EVP_DigestSignUpdate(priv->actx, data, len);
-	//EVP_DigestSignFinal(priv->actx, dst, &digest_len);
+	printf("%s(%d)\n", __func__, __LINE__);
+	hmac = HMAC(EVP_sha256(), priv->akey, 32, src, len, NULL, NULL);
+
+	int i;
+	printf("HMAC : ");
+	for(i=0;i<32;i++)
+		printf("%02x", hmac[i]);
+	printf("\n");
+
+	return digest_len;
 }
 
 void sa_destroy(sa_t * this)
@@ -83,7 +88,6 @@ void sa_destroy(sa_t * this)
 	priv_sa_t * priv = (priv_sa_t *)this;
 
 	EVP_CIPHER_CTX_free(priv->ectx);
-	EVP_MD_CTX_destroy(priv->actx);
 
 	free(this);
 }
@@ -97,7 +101,6 @@ sa_t * create_sa(void)
 	public = &private->public;
 
 	private->ectx = EVP_CIPHER_CTX_new();
-	private->actx = EVP_MD_CTX_new();
 
 	public->set_ekey = sa_set_ekey;
 	public->encrypt = sa_encrypt;
