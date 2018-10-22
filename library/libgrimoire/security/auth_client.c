@@ -1,3 +1,4 @@
+#include <libgrimoire/common/common.h>
 #include <libgrimoire/security/auth_client.h>
 #include <libgrimoire/security/auth.h>
 #include <libgrimoire/security/sa.h>
@@ -40,64 +41,63 @@ int auth_client_contract_peer(auth_client_t * this, peer_t * peer)
 {
 	priv_auth_client_t * priv = (priv_auth_client_t *)this;
 	sa_t * sa = priv->sa;
-	p1_init_t init_msg = {0, };
-	p1_resp_t resp_msg = {0, };
+	dh_t * dh = priv->dh;
 
+	p1_init_t p1i_msg = {0, };
+	p1_resp_t p1r_msg = {0, };
+	p2_init_t p2i_msg = {0, };
+	p2_resp_t p2r_msg = {0, };
+
+	int gx_size;
+	uint8_t * gx;
+	uint8_t hmac_modp[64];
 	uint8_t hmac_id[64];
 	int i;
 
 	/* Random Key */
 	srand(time(NULL));
-	for(i=0;i<sizeof(init_msg.k);i++)
-		init_msg.k[i] = (uint8_t)rand();
+	for(i=0;i<sizeof(p1i_msg.k);i++)
+		p1i_msg.k[i] = (uint8_t)rand();
 
-	strcpy(init_msg.id, priv->id);
+	strcpy(p1i_msg.id, priv->id);
+	p1i_msg.group = 0;
 
-	init_msg.group = 0;
-#if 0
-	printf("\nk : ");
-	for(i=0;i<sizeof(init_msg.k);i++)
-		printf("%02x", init_msg.k[i]);
-#endif
-	/* make hmac(k) */
-	printf("\n");
-	sa->sign(sa, init_msg.hmac_id, init_msg.id, sizeof(init_msg.id));
-	printf("hmac(id) : ");
-	for(i=0;i<sizeof(init_msg.hmac_id);i++)
-		printf("%02x", init_msg.hmac_id[i]);
-	printf("\n");
+	sa->sign(sa, p1i_msg.hmac_id, p1i_msg.id, sizeof(p1i_msg.id));
+	/* send init */
+	peer->write(peer, &p1i_msg, sizeof(p1i_msg));
+	p1_init_dump(&p1i_msg);
 
-	peer->write(peer, &init_msg, sizeof(init_msg));
+	/* wait */
 
-	peer->read(peer, &resp_msg, sizeof(resp_msg));	// get HMAC(K0, K)
+	/* receive resp */
+	peer->read(peer, &p1r_msg, sizeof(p1r_msg));
+	p1_resp_dump(&p1r_msg);
 
-	return this->verify_peer(this, peer);
-}
-
-int auth_client_verify_peer(auth_client_t * this, peer_t * peer)
-{
-	priv_auth_client_t * priv = (priv_auth_client_t *)this;
-	dh_t * dh = priv->dh;
-	uint8_t buffer[1024];
-
-	size_t gx_size;
-	uint8_t * gx_modp = NULL;
+	this->set_akey(this, p1i_msg.k, sizeof(p1i_msg.k));
+	sa->sign(sa, hmac_modp, p1r_msg.modp, sizeof(p1r_msg.modp));
+	if(0 != memcmp(hmac_modp, p1r_msg.hmac_modp, sizeof(p1r_msg.hmac_modp)))
+	{
+		binary_dump("hmac_modp", hmac_modp, sizeof(hmac_modp));
+		binary_dump("p1r_msg.hmac_modp", p1r_msg.hmac_modp, sizeof(p1r_msg.hmac_modp));
+		return -1;
+	}
 
 	dh->rand(dh);
 	dh->g_x_mod(dh);
+	gx = dh->export(dh, &gx_size);
+	memcpy(p2i_msg.modp, gx, gx_size);
+	free(gx);
 
-	gx_modp = (uint8_t *)dh->export(dh, &gx_size);
+	dh->g_xy_mod(dh, p1r_msg.modp);
 
-	peer->write(peer, gx_modp, gx_size);
+	sa->sign(sa, p2i_msg.hmac_modp, p2i_msg.modp, sizeof(p2i_msg.modp));
 
-	peer->read(peer, buffer, sizeof(buffer));
+	/* send init */
+	peer->write(peer, &p2i_msg, sizeof(p2i_msg));
+	p2_init_dump(&p2i_msg);
 
-	dh->g_xy_mod(dh, buffer);
-
-	dh->dump(dh);
-
-	if(gx_modp)
-		free(gx_modp);
+	/* receive resp */
+	peer->read(peer, &p2r_msg, sizeof(p2r_msg));
 
 	return 0;
 }
@@ -111,6 +111,22 @@ void auth_client_set_psk(auth_client_t * this, char * id, uint8_t * psk)
 	sa->set_akey(sa, psk, strlen(psk));
 }
 
+void auth_client_set_ekey(auth_client_t * this, uint8_t * key, int klen)
+{
+	priv_auth_client_t * priv = (priv_auth_client_t *)this;
+	sa_t * sa = priv->sa;
+
+	sa->set_ekey(sa, key, klen);
+}
+
+void auth_client_set_akey(auth_client_t * this, uint8_t * key, int klen)
+{
+	priv_auth_client_t * priv = (priv_auth_client_t *)this;
+	sa_t * sa = priv->sa;
+
+	sa->set_akey(sa, key, klen);
+}
+
 auth_client_t * create_auth_client(void)
 {
 	priv_auth_client_t * private;
@@ -122,8 +138,9 @@ auth_client_t * create_auth_client(void)
 	private->dh = create_dh(14);
 	private->sa = create_sa();
 	public->set_psk = auth_client_set_psk;
+	public->set_ekey = auth_client_set_ekey;
+	public->set_akey = auth_client_set_akey;
 	public->contract_peer = auth_client_contract_peer;
-	public->verify_peer = auth_client_verify_peer;
 
 	private->dh->rand_init(private->dh);
 

@@ -21,12 +21,18 @@ struct priv_sa {
 	uint8_t akey[64];
 };
 
-void sa_set_ekey(sa_t * this, uint8_t * iv, int ivlen, uint8_t * key, int klen)
+void sa_set_iv(sa_t * this, uint8_t * iv, int ivlen)
 {
 	priv_sa_t * priv = (priv_sa_t *)this;
 
 	memset(priv->iv, 0, sizeof(priv->iv));
 	memcpy(priv->iv, iv, ivlen);
+}
+
+void sa_set_ekey(sa_t * this, uint8_t * key, int klen)
+{
+	priv_sa_t * priv = (priv_sa_t *)this;
+
 	memset(priv->ekey, 0, sizeof(priv->ekey));
 	memcpy(priv->ekey, key, klen);
 }
@@ -105,6 +111,7 @@ sa_t * create_sa(void)
 
 	private->ectx = EVP_CIPHER_CTX_new();
 
+	public->set_iv = sa_set_iv;
 	public->set_ekey = sa_set_ekey;
 	public->encrypt = sa_encrypt;
 	public->decrypt = sa_decrypt;
