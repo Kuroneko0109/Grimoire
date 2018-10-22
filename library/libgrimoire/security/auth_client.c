@@ -1,6 +1,9 @@
 #include <libgrimoire/security/auth_client.h>
+#include <libgrimoire/security/auth.h>
+#include <libgrimoire/security/sa.h>
 //#include <auth_client/auth_client.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -26,22 +29,47 @@ typedef struct priv_auth_client priv_auth_client_t;
 
 struct priv_auth_client {
 	auth_client_t public;
-	
+
 	dh_t * dh;
-	uint8_t * psk;
+	sa_t * sa;
+
+	char * id;
 };
 
 int auth_client_contract_peer(auth_client_t * this, peer_t * peer)
 {
-	uint8_t buffer[1024];
-	uint8_t rnd[64];	// 512bit = 
-	int fd;
-        fd = open("/dev/random", O_RDONLY);
-        read(fd, &rnd, 64);
-        close(fd);
+	priv_auth_client_t * priv = (priv_auth_client_t *)this;
+	sa_t * sa = priv->sa;
+	p1_init_t init_msg = {0, };
+	p1_resp_t resp_msg = {0, };
 
-	peer->write(peer, rnd, sizeof(rnd));	// send K
-	peer->read(peer, buffer, sizeof(buffer));	// get HMAC(K0, K)
+	uint8_t hmac_id[64];
+	int i;
+
+	/* Random Key */
+	srand(time(NULL));
+	for(i=0;i<sizeof(init_msg.k);i++)
+		init_msg.k[i] = (uint8_t)rand();
+
+	strcpy(init_msg.id, priv->id);
+
+	init_msg.group = 0;
+#if 0
+	printf("\nk : ");
+	for(i=0;i<sizeof(init_msg.k);i++)
+		printf("%02x", init_msg.k[i]);
+#endif
+	/* make hmac(k) */
+	printf("\n");
+	sa->sign(sa, init_msg.hmac_id, init_msg.id, sizeof(init_msg.id));
+	printf("hmac(id) : ");
+	for(i=0;i<sizeof(init_msg.hmac_id);i++)
+		printf("%02x", init_msg.hmac_id[i]);
+	printf("\n");
+
+	peer->write(peer, &init_msg, sizeof(init_msg));
+
+	peer->read(peer, &resp_msg, sizeof(resp_msg));	// get HMAC(K0, K)
 
 	return this->verify_peer(this, peer);
 }
@@ -74,10 +102,13 @@ int auth_client_verify_peer(auth_client_t * this, peer_t * peer)
 	return 0;
 }
 
-void auth_client_set_psk(auth_client_t * this, uint8_t * psk)
+void auth_client_set_psk(auth_client_t * this, char * id, uint8_t * psk)
 {
 	priv_auth_client_t * priv = (priv_auth_client_t *)this;
-	priv->psk = psk;
+	sa_t * sa = priv->sa;
+
+	priv->id = id;
+	sa->set_akey(sa, psk, strlen(psk));
 }
 
 auth_client_t * create_auth_client(void)
@@ -88,7 +119,8 @@ auth_client_t * create_auth_client(void)
 	private = malloc(sizeof(priv_auth_client_t));
 	public = &private->public;
 
-	private->dh = create_dh(5);
+	private->dh = create_dh(14);
+	private->sa = create_sa();
 	public->set_psk = auth_client_set_psk;
 	public->contract_peer = auth_client_contract_peer;
 	public->verify_peer = auth_client_verify_peer;

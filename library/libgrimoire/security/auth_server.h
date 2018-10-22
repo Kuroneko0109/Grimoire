@@ -1,5 +1,5 @@
-#ifndef _AUTH_
-#define _AUTH_
+#ifndef _AUTH_SERVER_
+#define _AUTH_SERVER_
 
 #include <libgrimoire/security/dh.h>
 #include <libgrimoire/grid/peer.h>
@@ -13,6 +13,6 @@ struct auth_server {
 	void (*set_psk)(auth_server_t * this, uint8_t * psk);
 };
 
-auth_server_t * create_auth_server(void);
+auth_server_t * create_auth_server(char * account_path);
 
 #endif

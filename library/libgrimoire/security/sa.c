@@ -18,13 +18,16 @@ struct priv_sa {
 	uint8_t iv[32];
 	uint8_t ekey[32];
 
-	uint8_t akey[128];
+	uint8_t akey[64];
 };
 
 void sa_set_ekey(sa_t * this, uint8_t * iv, int ivlen, uint8_t * key, int klen)
 {
 	priv_sa_t * priv = (priv_sa_t *)this;
+
+	memset(priv->iv, 0, sizeof(priv->iv));
 	memcpy(priv->iv, iv, ivlen);
+	memset(priv->ekey, 0, sizeof(priv->ekey));
 	memcpy(priv->ekey, key, klen);
 }
 
@@ -62,6 +65,7 @@ void sa_set_akey(sa_t * this, uint8_t * key, int klen)
 {
 	priv_sa_t * priv = (priv_sa_t *)this;
 
+	memset(priv->akey, 0, sizeof(priv->akey));
 	memcpy(priv->akey, key, klen);
 }
 
@@ -71,14 +75,13 @@ void sa_sign(sa_t * this, void * dst, void * src, int len)
 	int digest_len;
 	uint8_t * hmac;
 
-	printf("%s(%d)\n", __func__, __LINE__);
+#if 0
 	hmac = HMAC(EVP_sha256(), priv->akey, 32, src, len, NULL, NULL);
-
-	int i;
-	printf("HMAC : ");
-	for(i=0;i<32;i++)
-		printf("%02x", hmac[i]);
-	printf("\n");
+	memcpy(dst, hmac, 32);
+#else
+	hmac = HMAC(EVP_sha512(), priv->akey, 64, src, len, NULL, NULL);
+	memcpy(dst, hmac, 64);
+#endif
 
 	return digest_len;
 }

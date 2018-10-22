@@ -73,8 +73,7 @@ void peer_destroy_tcp(peer_t * this)
 {
 	priv_peer_t * priv = (priv_peer_t *)this;
 
-	if(-1 != priv->fd)
-		close(priv->fd);
+	this->close(this);
 
 	free(this);
 }
