@@ -17,7 +17,7 @@ ssize_t security_client_write(security_client_t * this, int id, void * src, size
 	priv_security_client_t * priv = (priv_security_client_t *)this;
 	peer_t * peer = priv->peer;
 	sa_t * sa = priv->sa;
-	uint8_t buffer[4096];
+	uint8_t buffer[4096] = {0, };
 	cpkt_t * cpkt = buffer;
 	cpkt_proxy_hdr_t * phdr = cpkt->payload;
 	int rc;
@@ -29,6 +29,7 @@ ssize_t security_client_write(security_client_t * this, int id, void * src, size
 	sa->get_iv(sa, cpkt->iv);
 
 	memcpy(phdr->payload, src, size);
+	printf("phdr->payload ; %s\n", phdr->payload);
 	rc = sa->encrypt(sa, phdr, phdr, sizeof(phdr) + size);
 	cpkt->payload_len = rc;
 

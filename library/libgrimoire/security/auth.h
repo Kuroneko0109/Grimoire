@@ -25,7 +25,7 @@ typedef struct p2_init p2_init_t;
 struct p2_init {
 	uint8_t modp[256];
 	uint8_t hmac_modp[64];
-	int service_id;
+	int type;
 };
 
 #endif

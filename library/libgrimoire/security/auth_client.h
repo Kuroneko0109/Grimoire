@@ -15,6 +15,6 @@ struct auth_client {
         void (*set_akey)(auth_client_t * this, uint8_t * key, int klen);
 };
 
-auth_client_t * create_auth_client(void);
+auth_client_t * create_auth_client(int type);
 
 #endif

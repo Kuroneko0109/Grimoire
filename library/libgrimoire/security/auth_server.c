@@ -135,7 +135,7 @@ security_server_t * auth_server_contract_peer(auth_server_t * this, peer_t * pee
 	/* send resp */
 	peer->write(peer, cpkt, sizeof(cpkt_t) + rc);
 
-	return create_security_server(SPEER_MODE_SERVER, peer, sa);
+	return create_security_server(peer, sa, p2i_msg.type);
 }
 
 void auth_server_set_akey_by_psk(auth_server_t * this, sa_t * sa, uint8_t * id)

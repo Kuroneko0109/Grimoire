@@ -36,6 +36,8 @@ struct priv_auth_client {
 	dh_t * dh;
 	sa_t * sa;
 
+	int type;
+
 	char * id;
 };
 
@@ -102,6 +104,7 @@ security_client_t * auth_client_contract_peer(auth_client_t * this, peer_t * pee
 	sa->sign(sa, p2i_msg.hmac_modp, p2i_msg.modp, sizeof(p2i_msg.modp));
 
 	/* send init */
+	p2i_msg.type = priv->type;
 	peer->write(peer, &p2i_msg, sizeof(p2i_msg));
 	p2_init_dump(&p2i_msg);
 
@@ -143,7 +146,7 @@ void auth_client_set_psk(auth_client_t * this, char * id, uint8_t * psk)
 	sa->set_akey(sa, psk, strlen(psk));
 }
 
-auth_client_t * create_auth_client(void)
+auth_client_t * create_auth_client(int type)
 {
 	priv_auth_client_t * private;
 	auth_client_t * public;
@@ -157,6 +160,8 @@ auth_client_t * create_auth_client(void)
 	public->contract_peer = auth_client_contract_peer;
 
 	private->dh->rand_init(private->dh);
+
+	private->type = type;
 
 	return public;
 }
