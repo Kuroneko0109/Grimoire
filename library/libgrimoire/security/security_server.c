@@ -1,6 +1,8 @@
 #include <libgrimoire/security/security_server.h>
 #include <libgrimoire/security/cpkt.h>
 #include <libgrimoire/security/dh.h>
+#include <error.h>
+#include <errno.h>
 
 typedef struct priv_security_server priv_security_server_t;
 
@@ -8,6 +10,7 @@ struct priv_security_server {
 	security_server_t public;
 
 	int type;
+	char name[32];
 
 	peer_t * peer;
 	sa_t * sa;
@@ -47,6 +50,11 @@ ssize_t security_server_read(security_server_t * this, void * dst, size_t size)
 	cpkt_proxy_hdr_t * phdr;
 
 	rc = peer->read(peer, buffer, sizeof(buffer));
+	if(rc < 0 || rc == 0)
+	{
+		if(errno != EAGAIN)
+			return -1;
+	}
 
 	if(rc == sizeof(buffer))
 	{
@@ -84,19 +92,27 @@ void security_server_destroy(security_server_t * this)
 	free(this);
 }
 
+char * security_server_get_name(security_server_t * this)
+{
+	priv_security_server_t * priv = (priv_security_server_t *)this;
+	return priv->name;
+}
+
 int security_server_get_type(security_server_t * this)
 {
 	priv_security_server_t * priv = (priv_security_server_t *)this;
 	return priv->type;
 }
 
-security_server_t * create_security_server(peer_t * peer, sa_t * sa, int type)
+security_server_t * create_security_server(peer_t * peer, sa_t * sa, int type, char * name)
 {
 	priv_security_server_t * private;
 	security_server_t * public;
 
 	private = malloc(sizeof(priv_security_server_t));
 	public = &private->public;
+
+	strcpy(private->name, name);
 
 	private->peer = peer;
 	private->sa = sa;
@@ -106,6 +122,7 @@ security_server_t * create_security_server(peer_t * peer, sa_t * sa, int type)
 	public->read = security_server_read;
 	public->rekey = security_server_rekey;
 	public->get_type = security_server_get_type;
+	public->get_name = security_server_get_name;
 	public->destroy = security_server_destroy;
 
 	return public;

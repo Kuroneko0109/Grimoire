@@ -103,8 +103,9 @@ security_client_t * auth_client_contract_peer(auth_client_t * this, peer_t * pee
 
 	sa->sign(sa, p2i_msg.hmac_modp, p2i_msg.modp, sizeof(p2i_msg.modp));
 
-	/* send init */
 	p2i_msg.type = priv->type;
+	strcpy(p2i_msg.name, priv->id);
+	/* send init */
 	peer->write(peer, &p2i_msg, sizeof(p2i_msg));
 	p2_init_dump(&p2i_msg);
 

@@ -26,6 +26,7 @@ struct p2_init {
 	uint8_t modp[256];
 	uint8_t hmac_modp[64];
 	int type;
+	char name[32];
 };
 
 #endif
