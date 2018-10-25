@@ -21,9 +21,12 @@ struct dh {
 	void * (*get_key)(dh_t * this);
 	void * (*clear)(dh_t * this);
 
-	void * (*export)(dh_t * this, size_t * data_size);
+	void * (*export_gx)(dh_t * this, size_t * data_size);
+	void * (*export_gxy)(dh_t * this, size_t * data_size);
 
 	void (*dump)(dh_t * this);
+
+	void (*destroy)(dh_t * this);
 };
 
 dh_t * create_dh(int group);

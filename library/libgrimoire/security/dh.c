@@ -95,7 +95,7 @@ void dh_rand_init(dh_t * this)
 	uint32_t rnd;
 	int fd;
 	fd = open("/dev/random", O_RDONLY);
-	read(fd, &rnd, 4);
+	read(fd, &rnd, sizeof(rnd));
 	close(fd);
 
 	gmp_randinit_default(priv->rng_stat);
@@ -139,7 +139,7 @@ mpz_t * dh_get_g_x_mod(dh_t * this)
 	return &priv->gx_modp;
 }
 
-void * dh_export(dh_t * this, size_t * size)
+void * dh_export_gx(dh_t * this, size_t * size)
 {
 	priv_dh_t * priv = (priv_dh_t *)this;
 	int bits;
@@ -150,6 +150,21 @@ void * dh_export(dh_t * this, size_t * size)
 
 	if(bits)
 		return mpz_export(NULL, size, 1, 1, 1, 0, priv->gx_modp);
+
+	return NULL;
+}
+
+void * dh_export_gxy(dh_t * this, size_t * size)
+{
+	priv_dh_t * priv = (priv_dh_t *)this;
+	int bits;
+	int bytes;
+
+	bits = mpz_sizeinbase(priv->gxy_modp, 2);
+	bytes = bits/8;
+
+	if(bits)
+		return mpz_export(NULL, size, 1, 1, 1, 0, priv->gxy_modp);
 
 	return NULL;
 }
@@ -168,6 +183,11 @@ void dh_dump(dh_t * this)
 	printf("\n");
 }
 
+void dh_destroy(dh_t * this)
+{
+	free(this);
+}
+
 dh_t * create_dh(int group)
 {
 	priv_dh_t * private;
@@ -181,7 +201,8 @@ dh_t * create_dh(int group)
 	public->set_group = dh_set_group;
 	public->rand_init = dh_rand_init;
 	public->rand = dh_rand;
-	public->export = dh_export;
+	public->export_gx = dh_export_gx;
+	public->export_gxy = dh_export_gxy;
 
 	public->g_x_mod = dh_g_x_mod;
 	public->g_xy_mod = dh_g_xy_mod;
@@ -197,6 +218,7 @@ dh_t * create_dh(int group)
 	public->rand_init(public);
 	public->set_group(public, group);
 	public->dump = dh_dump;
+	public->destroy = dh_destroy;
 
 	return public;
 }

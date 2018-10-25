@@ -6,8 +6,8 @@
 typedef struct config_element config_element_t;
 
 struct config_element {
-	char key[32];
-	char val[64];
+	char key[64];
+	char val[192];
 };
 
 typedef struct config config_t;

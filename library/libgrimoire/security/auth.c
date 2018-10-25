@@ -21,7 +21,3 @@ void p2_init_dump(p2_init_t * msg)
 	binary_dump("p2init.modp", msg->modp, sizeof(msg->modp));
 	binary_dump("p2init.hmac_modp", msg->hmac_modp, sizeof(msg->hmac_modp));
 }
-
-void p2_resp_dump(p2_resp_t * msg)
-{
-}

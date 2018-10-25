@@ -28,11 +28,4 @@ struct p2_init {
 	int service_id;
 };
 
-typedef struct p2_resp p2_resp_t;
-
-struct p2_resp {
-	int result;
-	int sid;
-};
-
 #endif
