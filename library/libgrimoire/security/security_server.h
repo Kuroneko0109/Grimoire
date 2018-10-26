@@ -17,6 +17,7 @@ struct security_server {
 	void (*destroy)(security_server_t * this);
 	int (*get_type)(security_server_t * this);
 	char * (*get_name)(security_server_t * this);
+	int (*get_uid)(security_server_t * this);
 };
 
 security_server_t * create_security_server(peer_t * peer, sa_t * sa, int type, char * name);

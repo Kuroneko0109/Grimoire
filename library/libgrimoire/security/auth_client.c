@@ -135,7 +135,7 @@ security_client_t * auth_client_contract_peer(auth_client_t * this, peer_t * pee
 	rc = sa->decrypt(sa, &init_msg, cpkt->payload, cpkt->payload_len);
 	printf("init_msg->result : %d, init_msg->sid : %d\n", init_msg.result, init_msg.sid);
 
-	return create_security_client(SPEER_MODE_CLIENT, peer, sa);
+	return create_security_client(SPEER_TYPE_CLIENT, peer, sa);
 }
 
 void auth_client_set_psk(auth_client_t * this, char * id, uint8_t * psk)

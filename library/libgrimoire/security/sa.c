@@ -62,7 +62,7 @@ int sa_encrypt(sa_t * this, void * dst, void * src, int len)
 
 	EVP_EncryptFinal_ex(priv->ectx, dst + tmp, &outlen);
 
-	return outlen;
+	return tmp + outlen;
 }
 
 int sa_decrypt(sa_t * this, void * dst, void * src, int len)
@@ -77,7 +77,7 @@ int sa_decrypt(sa_t * this, void * dst, void * src, int len)
 
 	EVP_DecryptFinal_ex(priv->ectx, dst + tmp, &outlen);
 
-	return outlen;
+	return tmp + outlen;
 }
 
 void sa_set_akey(sa_t * this, uint8_t * key, int klen)
