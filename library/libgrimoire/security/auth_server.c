@@ -73,6 +73,7 @@ security_server_t * auth_server_contract_peer(auth_server_t * this, peer_t * pee
 	sa->sign(sa, hmac_id, p1i_msg.id, sizeof(p1i_msg.id));
 	if(0 != memcmp(hmac_id, p1i_msg.hmac_id, sizeof(p1i_msg.hmac_id)))
 	{
+		printf("%s(%d)\n", __func__, __LINE__);
 		binary_dump("ERROR! hmac_id", hmac_id, sizeof(hmac_id));
 		binary_dump("ERROR! p1i_msg.hmac_id", p1i_msg.hmac_id, sizeof(p1i_msg.hmac_id));
 		sa->destroy(sa);
@@ -105,6 +106,7 @@ security_server_t * auth_server_contract_peer(auth_server_t * this, peer_t * pee
 	sa->sign(sa, hmac_modp, p2i_msg.modp, sizeof(p2i_msg.modp));
 	if(0 != memcmp(hmac_modp, p2i_msg.hmac_modp, sizeof(p2i_msg.hmac_modp)))
 	{
+		printf("%s(%d)\n", __func__, __LINE__);
 		binary_dump("ERROR! hmac_modp", hmac_modp, sizeof(hmac_modp));
 		binary_dump("ERROR! p2i_msg.hmac_modp", p2i_msg.hmac_modp, sizeof(p2i_msg.hmac_modp));
 		sa->destroy(sa);

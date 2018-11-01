@@ -67,13 +67,13 @@ ssize_t security_client_read(security_client_t * this, void * dst, size_t size)
 			return -1;
 	}
 
-	binary_dump("pkt", buffer, sizeof(cpkt_t) + cpkt->payload_len);
-
 	if(rc == sizeof(buffer))
 	{
 		printf("%s(%d) error\n", __func__, __LINE__);
 		return -1;
 	}
+
+	binary_dump("encrypted pkt", buffer, sizeof(cpkt_t) + cpkt->payload_len);
 
 	rc = sizeof(cpkt_t);
 	if(cpkt->type == CPKT_PROXY)
@@ -81,6 +81,8 @@ ssize_t security_client_read(security_client_t * this, void * dst, size_t size)
 		sa->set_iv(sa, cpkt->iv);
 		rc += sa->decrypt(sa, cpkt->payload, cpkt->payload, cpkt->payload_len);
 	}
+
+	binary_dump("decrypted pkt", buffer, rc);
 
 	memcpy(dst, buffer, rc);
 

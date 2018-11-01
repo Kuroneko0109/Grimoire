@@ -133,6 +133,7 @@ sa_t * create_sa(void)
 
 	public->set_akey = sa_set_akey;
 	public->sign = sa_sign;
+	public->destroy = sa_destroy;
 
 	return public;
 }

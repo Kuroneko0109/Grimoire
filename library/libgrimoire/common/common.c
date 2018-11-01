@@ -19,11 +19,21 @@ void binary_dump(char * title, uint8_t * buffer, int size)
 {
 	int i;
 	int pc;
-	pc = printf("======== %s ========\n", title);
-	for(i=0;i<size;i++)
-		printf("%02x", buffer[i]);
+	pc = printf("========== %s ==========\n", title);
+	for(i=1;i<=size;i++)
+	{
+		printf("%02x", buffer[i-1]);
+		if(i % 8 == 0)
+			printf(" ");
+		if((i % 48 == 0) && (i != size))
+			printf("\n");
+	}
 	printf("\n");
+#if 1
+	printf("\n");
+#else
 	for(i=0;i<pc-1;i++)
 		printf("=");
 	printf("\n\n");
+#endif
 }

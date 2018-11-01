@@ -35,14 +35,13 @@ ssize_t security_server_write(security_server_t * this, void * src, size_t size)
 	sa->get_iv(sa, cpkt->iv);
 
 	memcpy(phdr->payload, src, size);
-	printf("%s(%d) phdr->payload : %s\n", __func__, __LINE__, phdr->payload);
 
 	binary_dump("plain", phdr, sizeof(phdr) + size);
 	rc = sa->encrypt(sa, phdr, phdr, sizeof(phdr) + size);
-	binary_dump("cipher", phdr, sizeof(phdr) + size);
 	cpkt->payload_len = rc;
+	binary_dump("cipher", phdr, sizeof(phdr) + rc);//sizeof(phdr) + size);
 
-	binary_dump("pkt", buffer, sizeof(cpkt_t) + cpkt->payload_len);
+//	binary_dump("pkt", buffer, sizeof(cpkt_t) + cpkt->payload_len);
 
 	return peer->write(peer, cpkt, sizeof(cpkt_t) + cpkt->payload_len);
 }
