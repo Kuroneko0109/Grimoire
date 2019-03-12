@@ -17,7 +17,7 @@ struct priv_list {
 
 	void * (*method_destroyer)(void *);
 	int (*method_compare)(void *, void *);
-	int (*method_sort)(void *, void *);
+	void (*method_sort)(iterator_t *, int (*)(void *, void *));
 	void * (*method_dump)(void *);
 
 	lock_t * lock;

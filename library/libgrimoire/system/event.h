@@ -4,7 +4,8 @@
 typedef struct event_ctrl event_ctrl_t;
 
 struct event_ctrl {
-	void (*register_event)(event_ctrl_t * this, char * id, int fd, void (*func)(int));
+	void (*register_event)(event_ctrl_t * this,
+			char * id, int (*distinct)(void *), void * (*callback)(void *), void * param);
 	void (*event_ctrl_poll)(event_ctrl_t * this);
 };
 

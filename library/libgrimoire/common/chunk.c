@@ -1,4 +1,6 @@
 #include <libgrimoire/common/chunk.h>
+#include <stdlib.h>
+#include <memory.h>
 
 typedef struct priv_chunk priv_chunk_t;
 
@@ -15,7 +17,7 @@ int chunk_get_size(chunk_t * this)
 	return priv->size;
 }
 
-void * chunk_get_data(chunk_t * this)
+uint8_t * chunk_get_data(chunk_t * this)
 {
 	priv_chunk_t * priv = (priv_chunk_t *)this;
 	return priv->data;

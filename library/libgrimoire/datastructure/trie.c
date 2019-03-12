@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
 typedef struct priv_trie priv_trie_t;
 
@@ -65,13 +66,13 @@ int trie_insert(trie_t * this, void * src, int src_len, void * data)
 	return 0;
 }
 
-int trie_remove(trie_t * this, void * src, int src_len)
+int trie_remove(trie_t * this, void * src, int src_len, void * data)
 {
-	priv_trie_t * priv = (priv_trie_t *)this;
-	uint8_t * byte = src;
+//	priv_trie_t * priv = (priv_trie_t *)this;
+//	uint8_t * byte = src;
 	trie_layer_t * layer;
 	trie_layer_t * parent;
-	int i;
+//	int i;
 
 	layer = this->find(this, src, src_len);
 	while((parent = layer->get_parent(layer)))
@@ -104,12 +105,10 @@ void trie_dump(trie_t * this)
 {
 	priv_trie_t * priv = (priv_trie_t *)this;
 	trie_layer_t * layer = priv->root;
-	int i;
+//	int i;
 
 	printf("%s\n", __func__);
 	layer->dump(layer);
-
-	return 0;
 }
 
 trie_t * create_trie(int radix, uint8_t * mapping_table)

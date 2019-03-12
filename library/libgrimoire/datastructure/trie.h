@@ -7,8 +7,8 @@
 typedef struct trie trie_t;
 
 struct trie {
-	int (*insert)(trie_t * this, void * src, int src_len);
-	int (*remove)(trie_t * this, void * src, int src_len);
+	int (*insert)(trie_t * this, void * src, int src_len, void * data);
+	int (*remove)(trie_t * this, void * src, int src_len, void * data);
 	trie_layer_t * (*find)(trie_t * this, void * src, int src_len);
 	void (*dump)(trie_t * this);
 };

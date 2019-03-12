@@ -3,11 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* polling driven */
+
 typedef struct event event_t;
 
 struct event {
-	int fd;
-	void (*callback)(int);
+	void * param;
+	int (*distinct)(void *);
+	void * (*callback)(void *);
 	char * id;
 };
 
@@ -19,12 +22,13 @@ int event_id_compare(void * _s, void * _d)
 	return strcmp(s->id, d->id);
 }
 
-event_t * create_event(char * id, int fd, void * (*callback)(void *))
+event_t * create_event(char * id, int (*distinct)(void *), void * (*callback)(void *), void * param)
 {
 	event_t * event = malloc(sizeof(event_t));
 	event->id = id;
-	event->fd = fd;
+	event->distinct = distinct;
 	event->callback = callback;
+	event->param = param;
 	return event;
 }
 
@@ -39,7 +43,9 @@ struct priv_event_ctrl {
 void * event_ctrl_watch(void * param)
 {
 	event_t * event = param;
-	event->callback(event->fd);
+	if(event->distinct(event->param))
+		return event->callback(event->param);
+	return NULL;
 }
 
 void event_ctrl_poll(event_ctrl_t * this)
@@ -50,13 +56,14 @@ void event_ctrl_poll(event_ctrl_t * this)
 	list->foreach(list, event_ctrl_watch);
 }
 
-void event_ctrl_register_event(event_ctrl_t * this, char * id, int fd, void (*func)(int *))
+void event_ctrl_register_event(event_ctrl_t * this,
+		char * id, int (*distinct)(void *), void * (*callback)(void *), void * param)
 {
 	priv_event_ctrl_t * priv = (priv_event_ctrl_t *)this;
 	list_t * list = priv->event_list;
 	event_t * event;
 
-	event = create_event(id, fd, func);
+	event = create_event(id, distinct, callback, param);
 
 	list->lock(list);
 	list->enqueue_data(list, event);
@@ -78,8 +85,6 @@ void __attribute__((constructor)) init_event_ctrl_global(void)
 
 	public->register_event = event_ctrl_register_event;
 	public->event_ctrl_poll = event_ctrl_poll;
-
-	return public;
 }
 
 event_ctrl_t * get_event_ctrl_global(void)

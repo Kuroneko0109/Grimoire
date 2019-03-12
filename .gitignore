@@ -2,3 +2,4 @@
 *.swp
 output
 build.mk
+cscope.out
