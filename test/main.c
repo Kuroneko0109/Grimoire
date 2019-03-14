@@ -4,7 +4,32 @@
 #include <libgrimoire/system/thread.h>
 #include <libgrimoire/grid/peer.h>
 #include <libgrimoire/grid/acceptor.h>
+#include <libgrimoire/math/vector.h>
+#include <libgrimoire/datastructure/iterator.h>
 
+#if 1
+int main(int argc, char * argv[])
+{
+	int a;
+	int i;
+	vector_t * vector = create_vector();
+	iterator_t * iterator;
+
+	a = 2;
+	for(i=0;i<5;i++)
+	{
+		vector->add_dimension(vector, a);
+		a = a << 1;
+	}
+
+	iterator = vector->get_dimension(vector);
+	printf("iterator size : %d\n", iterator->get_count(iterator));
+	for(i=0;i<5;i++)
+		printf("dimension %d size : %d\n", i, vector->get_dimension_size(vector, i));
+
+	return 0;
+}
+#else
 void * chomama(void * param)
 {
 	printf("%s(%d)\n", __func__, __LINE__);
@@ -49,3 +74,4 @@ int main(int argc, char * argv[])
 
 	return 0;
 }
+#endif
