@@ -10,6 +10,6 @@ struct layer {
 	int (*get_dimension)(layer_t * this);
 };
 
-layer_t * create_layer(int x, int y);
+layer_t * create_layer(void);
 
 #endif

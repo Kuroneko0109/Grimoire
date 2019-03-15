@@ -192,8 +192,8 @@ void list_dump(list_t * this)
 
 	printf("list dump\n");
 	printf("head : %p, tail : %p\n", priv->head, priv->tail);
-	for(node=priv->head;node;node=node->get_rear(node))
-		printf("node(%d, %p) front : %p, rear : %p\n", i++, node, node->get_front(node), node->get_rear(node));
+//	for(node=priv->head;node;node=node->get_rear(node))
+//		printf("node(%d, %p) front : %p, rear : %p\n", i++, node, node->get_front(node), node->get_rear(node));
 
 	if(priv->method_dump)
 		this->foreach(this, priv->method_dump);
