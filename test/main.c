@@ -7,13 +7,36 @@
 #include <libgrimoire/math/vector.h>
 #include <libgrimoire/datastructure/iterator.h>
 #include <libgrimoire/nlp/knowledge.h>
+#include <libgrimoire/config/config.h>
+#include <libgrimoire/system/cpu.h>
 
 #include <jansson.h>
 #include <iconv.h>
 
-#if 1
+void * collector(void * data);
+
+void * garbage(void * data);
 
 int main(int argc, char * argv[])
+{
+	cpu_t * cpu;
+	config_t * config_test = create_config(argv[1], 8192);
+	if(config_test)
+		init_cpu(config_test);
+
+	cpu = get_global_cpu();
+	cpu->dump_info();
+
+	cpu->task_register(
+			create_task("", collector, argv[2], NULL),
+			1);
+
+	cpu->drive();
+
+	return 0;
+}
+
+void * collector(void * param)
 {
 	knowledge_t * knowledge;
 
@@ -34,7 +57,7 @@ int main(int argc, char * argv[])
 
 	knowledge = create_knowledge();
 
-	f = fopen(argv[1], "r");
+	f = fopen(param, "r");
 	printf("f : %p\n", f);
 	if(!f)
 		return 0;
@@ -104,54 +127,5 @@ int main(int argc, char * argv[])
 
 	fclose(f);
 
-	return 0;
-}
-
-#else
-
-void * chomama(void * param)
-{
-	printf("%s(%d)\n", __func__, __LINE__);
-	usleep(100000);
 	return NULL;
 }
-
-void * chomamama(void * param)
-{
-	printf("%s(%d)\n", __func__, __LINE__);
-	usleep(100000);
-	return NULL;
-}
-
-int main(int argc, char * argv[])
-{
-	printf("Hello! Happy world!\n");
-	thread_t * test_thread;
-	peer_t * peer;
-	acceptor_t * acceptor;
-
-	list_t * list = create_list(NULL, NULL, NULL);
-	task_t * task1 = create_task("chomama", chomama, NULL, NULL);
-	task_t * task2 = create_task("chomamama", chomamama, NULL, NULL);
-	list->enqueue_data(list, task1);
-	list->enqueue_data(list, task2);
-	test_thread = create_thread(list);
-
-	peer = create_peer(AF_UNIX);
-	acceptor = create_acceptor(AF_UNIX);
-
-	peer->destroy(peer);
-	acceptor->destroy(acceptor);
-
-	test_thread->execute_once(test_thread);
-//	test_thread->run(test_thread);
-	sleep(1);
-
-	test_thread->destroy(test_thread);
-
-	sleep(10);
-
-	return 0;
-}
-
-#endif

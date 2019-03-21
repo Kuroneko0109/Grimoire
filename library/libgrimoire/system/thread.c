@@ -1,5 +1,10 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdlib.h>
+#include <sched.h>
+#include <unistd.h>
 #include <pthread.h>
 
 #include <libgrimoire/system/task.h>
@@ -12,6 +17,8 @@ struct priv_thread {
 	thread_t public;
 
 	list_t * task_list;
+
+	cpu_set_t cpuset;
 
 	int state;
 	int pthread_id;
@@ -87,6 +94,8 @@ int thread_run(thread_t * this)
 	priv->state = 1;
 	priv->pthread_id = pthread_create(
 			&priv->pthread, NULL, priv->thread_driver, priv);
+
+	pthread_setaffinity_np(&priv->pthread, sizeof(cpu_set_t), &priv->cpuset);
 	return priv->pthread_id;
 }
 
@@ -103,6 +112,15 @@ void thread_dump(thread_t * this)
 	priv_thread_t * priv = (priv_thread_t *)this;
 	list_t * task_list = priv->task_list;
 
+#if 0
+	printf("%s(%d)\n", __func__, __LINE__);
+	printf("Thread Info -> cpu : %x\n",
+			pthread_getaffinity_np(
+				priv->pthread,
+				sizeof(cpu_set_t),
+				&priv->cpuset));
+	printf("%s(%d)\n", __func__, __LINE__);
+#endif
 	task_list->lock(task_list);
 	task_list->unlock(task_list);
 }
@@ -115,6 +133,14 @@ void thread_execute_once(thread_t * this)
 	task_list->lock(task_list);
 	task_list->foreach(task_list, task_exec);
 	task_list->unlock(task_list);
+}
+
+void thread_core_bind(thread_t * this, int core_num)
+{
+	priv_thread_t * priv = (priv_thread_t *)this;
+
+	CPU_ZERO(&priv->cpuset);
+	CPU_SET(core_num, &priv->cpuset);
 }
 
 thread_t * create_thread(list_t * task_list)
@@ -132,6 +158,7 @@ thread_t * create_thread(list_t * task_list)
 	public->dump = thread_dump;
 	public->destroy = thread_destroy;
 	public->run = thread_run;
+	public->core_bind = thread_core_bind;
 
 	if(NULL == task_list)
 		private->task_list = create_list(NULL, NULL, NULL);
@@ -139,6 +166,10 @@ thread_t * create_thread(list_t * task_list)
 		private->task_list = task_list;
 
 	private->thread_driver = thread_invoke;
+
+	CPU_ZERO(&private->cpuset);
+	CPU_SET(1, &private->cpuset);
+	thread_core_bind(public, 0);
 
 	return public;
 }
