@@ -95,7 +95,10 @@ int thread_run(thread_t * this)
 	priv->pthread_id = pthread_create(
 			&priv->pthread, NULL, priv->thread_driver, priv);
 
-	pthread_setaffinity_np(&priv->pthread, sizeof(cpu_set_t), &priv->cpuset);
+	pthread_setaffinity_np(&priv->pthread,
+			sizeof(cpu_set_t),
+			&priv->cpuset);
+
 	return priv->pthread_id;
 }
 
@@ -112,8 +115,8 @@ void thread_dump(thread_t * this)
 	priv_thread_t * priv = (priv_thread_t *)this;
 	list_t * task_list = priv->task_list;
 
-#if 0
 	printf("%s(%d)\n", __func__, __LINE__);
+#if 0
 	printf("Thread Info -> cpu : %x\n",
 			pthread_getaffinity_np(
 				priv->pthread,
@@ -135,12 +138,12 @@ void thread_execute_once(thread_t * this)
 	task_list->unlock(task_list);
 }
 
-void thread_core_bind(thread_t * this, int core_num)
+void thread_core_bind(thread_t * this, int core_mask)
 {
 	priv_thread_t * priv = (priv_thread_t *)this;
 
 	CPU_ZERO(&priv->cpuset);
-	CPU_SET(core_num, &priv->cpuset);
+	CPU_SET(core_mask, &priv->cpuset);
 }
 
 thread_t * create_thread(list_t * task_list)
@@ -167,9 +170,9 @@ thread_t * create_thread(list_t * task_list)
 
 	private->thread_driver = thread_invoke;
 
-	CPU_ZERO(&private->cpuset);
-	CPU_SET(1, &private->cpuset);
 	thread_core_bind(public, 0);
+
+	public->dump(public);
 
 	return public;
 }
