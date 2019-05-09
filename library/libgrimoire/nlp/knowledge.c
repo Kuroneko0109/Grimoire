@@ -1,6 +1,7 @@
 #include <libgrimoire/datastructure/hashlist.h>
 #include <libgrimoire/nlp/knowledge.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef struct _knowledge priv_knowledge_t;
 struct _knowledge {
@@ -48,7 +49,14 @@ void knowledge_dump(knowledge_t * this)
 
 int knowledge_string_hasher(char * string)
 {
-	return (int)string[0];
+	int i;
+	char ret = 0;
+	int len = strlen(string);
+
+	for(i=0;i<len;i++)
+		ret ^= string[i];
+
+	return (int)ret;
 }
 
 knowledge_t * create_knowledge(void)
