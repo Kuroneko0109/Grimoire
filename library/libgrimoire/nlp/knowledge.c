@@ -41,13 +41,12 @@ void * knowledge_list_dump_method(void * data)
 void knowledge_dump(knowledge_t * this)
 {
 	priv_knowledge_t * priv = (priv_knowledge_t *)this;
-	list_t * dictionary = priv->dictionary;
-
+	hashlist_t * dictionary = priv->dictionary;
+	
 	dictionary->dump(dictionary);
-	printf("Dictionary size : %d\n", dictionary->count(dictionary));
 }
 
-int knowledge_string_hasher(char * string)
+unsigned int knowledge_string_hasher(char * string)
 {
 	int i;
 	char ret = 0;
@@ -56,7 +55,7 @@ int knowledge_string_hasher(char * string)
 	for(i=0;i<len;i++)
 		ret ^= string[i];
 
-	return (int)ret;
+	return (unsigned int)ret;
 }
 
 knowledge_t * create_knowledge(void)

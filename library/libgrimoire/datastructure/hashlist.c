@@ -8,9 +8,9 @@ typedef struct priv_hashlist priv_hashlist_t;
 struct priv_hashlist {
 	hashlist_t public;
 
-	int (*hasher)(hashlist_t * this, void * data);
-	int (*_hasher)(void * data);
-	int hash_size;
+	unsigned int (*hasher)(hashlist_t * this, void * data);
+	unsigned int (*_hasher)(void * data);
+	unsigned int hash_size;
 
 	list_t * chain[0];
 };
@@ -25,11 +25,8 @@ struct hasher_extend {
 int hashlist_hasher_wrap(hashlist_t * this, void * data)
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
-	int ret;
+	unsigned int ret;
 	ret = priv->_hasher(data) % priv->hash_size;
-
-	if(ret<0)
-		ret *= -1;
 
 	return ret;
 }
@@ -52,8 +49,18 @@ void * hashlist_find_data(hashlist_t * this, void * sample)
 	return chain->find_data(chain, sample);
 }
 
+void hashlist_dump(hashlist_t * this)
+{
+	priv_hashlist_t * priv = (priv_hashlist_t *)this;
+	int i;
+	list_t * chain;
+
+	for(i=0;i<priv->hash_size;i++)
+		priv->chain[i]->dump(priv->chain[i]);
+}
+
 hashlist_t * create_hashlist(
-		int (*hasher)(void *),
+		unsigned int (*hasher)(void *),
 		int hash_size,
 		void * (*method_destroyer)(void *),
 		int (*method_compare)(void *, void *),
@@ -72,6 +79,7 @@ hashlist_t * create_hashlist(
 
 	public->input_data = hashlist_input_data;
 	public->find_data = hashlist_find_data;
+	public->dump = hashlist_dump;
 
 	for(i=0;i<hash_size;i++)
 		private->chain[i] = create_list(method_destroyer, method_compare, method_dump);

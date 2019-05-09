@@ -8,10 +8,11 @@ typedef struct hashlist hashlist_t;
 struct hashlist {
 	void (*input_data)(hashlist_t * this, void * data);
 	void * (*find_data)(hashlist_t * this, void * data);
+	void (*dump)(hashlist_t * this);
 };
 
 hashlist_t * create_hashlist(
-		int (*hasher)(void *),
+		unsigned int (*hasher)(void *),
 		int hash_size,
 		void * (*method_destroyer)(void *),
 		int (*method_compare)(void *, void *),
