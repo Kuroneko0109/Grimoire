@@ -1,4 +1,4 @@
-#include <libgrimoire/datastructure/list.h>
+#include <libgrimoire/datastructure/hashlist.h>
 #include <libgrimoire/nlp/knowledge.h>
 #include <stdlib.h>
 
@@ -6,18 +6,18 @@ typedef struct _knowledge priv_knowledge_t;
 struct _knowledge {
 	knowledge_t public;
 	
-	list_t * dictionary;
+	hashlist_t * dictionary;
 };
 
 int knowledge_input(knowledge_t * this, char * word)
 {
 	priv_knowledge_t * priv = (priv_knowledge_t *)this;
-	list_t * dictionary = priv->dictionary;
+	hashlist_t * dictionary = priv->dictionary;
 
-	if(dictionary->find(dictionary, word))
+	if(dictionary->find_data(dictionary, word))
 		return -1;
 
-	dictionary->enqueue_data(dictionary, word);
+	dictionary->input_data(dictionary, word);
 	return 0;
 }
 
@@ -46,6 +46,11 @@ void knowledge_dump(knowledge_t * this)
 	printf("Dictionary size : %d\n", dictionary->count(dictionary));
 }
 
+int knowledge_string_hasher(char * string)
+{
+	return (int)string[0];
+}
+
 knowledge_t * create_knowledge(void)
 {
 	priv_knowledge_t * private;
@@ -53,8 +58,10 @@ knowledge_t * create_knowledge(void)
 
 	private = malloc(sizeof(priv_knowledge_t));
 	public = &private->public;
-
-	private->dictionary = create_list(NULL,
+	private->dictionary = create_hashlist(
+			knowledge_string_hasher,
+			256,
+			NULL,
 			knowledge_list_compare_method,
 			knowledge_list_dump_method);
 

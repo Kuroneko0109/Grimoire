@@ -53,7 +53,8 @@ void * collector(void * param)
 
 	json_error_t err;
 
-	char buffer[8192];
+	char * buffer;
+	buffer = malloc(65536);
 
 	knowledge = create_knowledge();
 
@@ -92,7 +93,9 @@ void * collector(void * param)
 		{
 			qa = json_array_get(paragraphs, j);
 			if(!qa)
+			{
 				return 0;
+			}
 	
 			context = json_object_get(qa, "context");
 	
@@ -125,7 +128,9 @@ void * collector(void * param)
 	crashed_knowledge->dump(crashed_knowledge);
 	printf("\n\nend...\n");
 
+	free(buffer);
 	fclose(f);
+	exit(0);
 
 	return NULL;
 }
