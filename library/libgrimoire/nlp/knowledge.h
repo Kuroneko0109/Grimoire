@@ -7,6 +7,6 @@ struct knowledge {
 	void (*dump)(knowledge_t * this);
 };
 
-knowledge_t * create_knowledge(void);
+knowledge_t * create_knowledge(unsigned int);
 
 #endif

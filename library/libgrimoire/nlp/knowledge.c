@@ -49,16 +49,22 @@ void knowledge_dump(knowledge_t * this)
 unsigned int knowledge_string_hasher(char * string)
 {
 	int i;
-	char ret = 0;
+	int j;
+	unsigned int ret = 0;
+	char * p = &ret;
 	int len = strlen(string);
 
+	j = 0;
 	for(i=0;i<len;i++)
-		ret ^= string[i];
+	{
+		p[j] ^= string[i];
+		j = (j+1)%sizeof(ret);
+	}
 
-	return (unsigned int)ret;
+	return ret;
 }
 
-knowledge_t * create_knowledge(void)
+knowledge_t * create_knowledge(unsigned int hash_size)
 {
 	priv_knowledge_t * private;
 	knowledge_t * public;
@@ -67,7 +73,7 @@ knowledge_t * create_knowledge(void)
 	public = &private->public;
 	private->dictionary = create_hashlist(
 			knowledge_string_hasher,
-			256,
+			hash_size,
 			NULL,
 			knowledge_list_compare_method,
 			knowledge_list_dump_method);

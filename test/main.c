@@ -39,6 +39,7 @@ int main(int argc, char * argv[])
 void * collector(void * param)
 {
 	knowledge_t * knowledge;
+	knowledge_t * crashed_knowledge;
 
 	FILE * f;
 	json_t * root;
@@ -56,7 +57,8 @@ void * collector(void * param)
 	char * buffer;
 	buffer = malloc(65536);
 
-	knowledge = create_knowledge();
+	knowledge = create_knowledge(1024);
+	crashed_knowledge = create_knowledge(1024);
 
 	f = fopen(param, "r");
 	printf("f : %p\n", f);
@@ -75,7 +77,6 @@ void * collector(void * param)
 
 	int paragraph_count = 0;
 	int i;
-	knowledge_t * crashed_knowledge = create_knowledge();
 	for(i=0;i<json_array_size(data);i++)
 	{
 		obj = json_array_get(data, i);
@@ -124,8 +125,8 @@ void * collector(void * param)
 		paragraph_count++;
 	}
 
-	knowledge->dump(knowledge);
-	crashed_knowledge->dump(crashed_knowledge);
+//	knowledge->dump(knowledge);
+//	crashed_knowledge->dump(crashed_knowledge);
 	printf("\n\nend...\n");
 
 	free(buffer);

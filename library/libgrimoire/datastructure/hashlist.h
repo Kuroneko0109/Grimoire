@@ -13,7 +13,7 @@ struct hashlist {
 
 hashlist_t * create_hashlist(
 		unsigned int (*hasher)(void *),
-		int hash_size,
+		unsigned int hash_size,
 		void * (*method_destroyer)(void *),
 		int (*method_compare)(void *, void *),
 		void * (*method_dump)(void *));
