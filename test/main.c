@@ -125,7 +125,7 @@ void * collector(void * param)
 		paragraph_count++;
 	}
 
-//	knowledge->dump(knowledge);
+	knowledge->dump(knowledge);
 //	crashed_knowledge->dump(crashed_knowledge);
 	printf("\n\nend...\n");
 

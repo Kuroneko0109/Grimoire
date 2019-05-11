@@ -42,8 +42,15 @@ void knowledge_dump(knowledge_t * this)
 {
 	priv_knowledge_t * priv = (priv_knowledge_t *)this;
 	hashlist_t * dictionary = priv->dictionary;
+	list_t * merged;
 	
-	dictionary->dump(dictionary);
+//	dictionary->dump(dictionary);
+	dictionary->count(dictionary);
+
+	printf("start mergeing...\n");
+	merged = dictionary->merge(dictionary);
+	printf("ok...\n");
+	merged->count(merged);
 }
 
 unsigned int knowledge_string_hasher(char * string)
@@ -64,6 +71,14 @@ unsigned int knowledge_string_hasher(char * string)
 	return ret;
 }
 
+void * knowledge_copy(void * data)
+{
+	char * ret;
+	ret = malloc(strlen(data) + 1);
+	strcpy(ret, data);
+	return (void *)ret;
+}
+
 knowledge_t * create_knowledge(unsigned int hash_size)
 {
 	priv_knowledge_t * private;
@@ -77,6 +92,8 @@ knowledge_t * create_knowledge(unsigned int hash_size)
 			NULL,
 			knowledge_list_compare_method,
 			knowledge_list_dump_method);
+
+	private->dictionary->set_copy(private->dictionary, knowledge_copy);
 
 	public->input = knowledge_input;
 	public->dump = knowledge_dump;

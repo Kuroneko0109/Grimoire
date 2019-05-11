@@ -18,6 +18,7 @@ struct priv_list {
 	void * (*method_destroyer)(void *);
 	int (*method_compare)(void *, void *);
 	void (*method_sort)(iterator_t *, int (*)(void *, void *));
+	void * (*method_copy)(void *);
 	void * (*method_dump)(void *);
 
 	lock_t * lock;
@@ -28,6 +29,8 @@ iterator_t * list_get_iterator(list_t * this)
 	priv_list_t * priv = (priv_list_t *)this;
 	iterator_t * iterator;
 	node_t * node;
+	void * (*method_copy)(void *) = priv->method_copy;
+	void * data;
 
 	int count;
 	int i;
@@ -38,7 +41,12 @@ iterator_t * list_get_iterator(list_t * this)
 	node = priv->head;
 	for(i=0;i<count;i++)
 	{
-		iterator->set_data(iterator, node->get_data(node), i);
+		if(method_copy)
+			data = method_copy(node->get_data(node));
+		else
+			data = node->get_data(node);
+
+		iterator->set_data(iterator, data, i);
 		node = node->get_rear(node);
 	}
 
@@ -233,6 +241,12 @@ int list_count(list_t * this)
 	return i;
 }
 
+void * list_set_copy(list_t * this, void * (*method_copy)(void *))
+{
+	priv_list_t * priv = (priv_list_t *)this;
+	priv->method_copy = method_copy;
+}
+
 void list_set_sort(list_t * this, void (*method_sort)(iterator_t *, int (*)(void *, void *)))
 {
 	priv_list_t * priv = (priv_list_t *)this;
@@ -281,10 +295,12 @@ list_t * create_list(
 
 	private->method_destroyer = method_destroyer;
 	private->method_compare = method_compare;
+	private->method_copy = NULL;
 	private->method_sort = NULL;
 	private->method_dump = method_dump;
 	private->lock = create_lock();
 
+	public->set_copy = list_set_copy;
 	public->count = list_count;
 	public->get_iterator = list_get_iterator;
 	public->find = list_find;

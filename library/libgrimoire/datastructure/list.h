@@ -20,6 +20,7 @@ struct list {
 
 	node_t * (*detach)(list_t *, node_t *);
 
+	void (*set_copy)(list_t *, void * (*)(void *));
 	void (*set_sort)(list_t *, void (*)(iterator_t *, int (*)(void *, void *)));
 	void (*sort)(list_t *);
 
