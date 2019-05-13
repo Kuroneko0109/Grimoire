@@ -1,4 +1,4 @@
-BUILD_DIR = grid common config datastructure system delivery chrono math nlp #security
+BUILD_DIR = grid common config datastructure system delivery chrono math nlp network #security
 
 all : $(BUILD_DIR)
 

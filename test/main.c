@@ -9,10 +9,25 @@
 #include <libgrimoire/nlp/knowledge.h>
 #include <libgrimoire/config/config.h>
 #include <libgrimoire/system/cpu.h>
+#include <libgrimoire/network/pkt_collector.h>
 
 #include <jansson.h>
 #include <iconv.h>
 
+#if 1
+int main(int argc, char * argv[])
+{
+	pkt_collector_t * clt;
+	clt = create_pkt_collector();
+	clt->watch_device(clt, "enp3s0");
+
+	clt->init(clt);
+	while(1)
+		printf("gather size : %d\n", clt->gather(clt));
+
+	return 0;
+}
+#else
 void * collector(void * data);
 
 void * garbage(void * data);
@@ -135,3 +150,4 @@ void * collector(void * param)
 
 	return NULL;
 }
+#endif
