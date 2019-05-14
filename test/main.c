@@ -19,7 +19,7 @@ int main(int argc, char * argv[])
 {
 	pkt_collector_t * clt;
 	clt = create_pkt_collector();
-	clt->watch_device(clt, "enp3s0");
+	clt->watch_device(clt, "ens33");
 
 	clt->init(clt);
 	while(1)

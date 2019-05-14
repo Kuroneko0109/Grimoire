@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <pcap.h>
 
+#define MAX_L2_PAYLOAD	(65536)
+
 typedef struct priv_pkt_collector priv_pkt_collector_t;
 
 struct priv_pkt_collector {
@@ -12,7 +14,7 @@ struct priv_pkt_collector {
 
 	list_t * device;
 	iterator_t * iterator;
-	uint8_t buffer[BUFSIZ];
+	uint8_t buffer[MAX_L2_PAYLOAD];
 
 	pcap_t * pcap;
 };
@@ -44,12 +46,9 @@ int pkt_collector_gather(pkt_collector_t * this)
 	uint8_t * pkt;
 	struct pcap_pkthdr hdr;
 
-	printf("%s(%d)\n", __func__, __LINE__);
 	pkt = pcap_next(priv->pcap, &hdr);
-	printf("%s(%d) %p\n", __func__, __LINE__, pkt);
 	if(pkt)
 		memcpy(priv->buffer, pkt, hdr.len);
-	printf("%s(%d)\n", __func__, __LINE__);
 
 	return hdr.len;
 }
