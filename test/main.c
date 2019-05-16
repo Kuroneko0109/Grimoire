@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
 
 	clt->init(clt);
 	while(1)
-		printf("gather size : %d\n", clt->gather(clt));
+		printf("gather : %p\n", clt->gather(clt));
 
 	return 0;
 }

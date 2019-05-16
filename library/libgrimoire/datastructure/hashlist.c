@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <libgrimoire/datastructure/hashlist.h>
@@ -26,7 +27,7 @@ struct hasher_extend {
 };
 */
 
-int hashlist_hasher_wrap(hashlist_t * this, void * data)
+unsigned int hashlist_hasher_wrap(hashlist_t * this, void * data)
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
 	unsigned int ret;
@@ -56,8 +57,7 @@ void * hashlist_find_data(hashlist_t * this, void * sample)
 void hashlist_dump(hashlist_t * this)
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
-	int i;
-	list_t * chain;
+	unsigned int i;
 
 	for(i=0;i<priv->hash_size;i++)
 		priv->chain[i]->dump(priv->chain[i]);
@@ -66,9 +66,8 @@ void hashlist_dump(hashlist_t * this)
 void hashlist_count(hashlist_t * this)
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
-	int i;
+	unsigned int i;
 	int count;
-	list_t * chain;
 
 	count = 0;
 	for(i=0;i<priv->hash_size;i++)
@@ -83,9 +82,7 @@ list_t * hashlist_merge(hashlist_t * this)
 	list_t * ret;
 	list_t * chain;
 	iterator_t * iterator;
-	int count;
-	int i;
-	int j;
+	unsigned int i;
 	void * data;
 
 	ret = create_list(priv->method_destroyer, priv->method_compare, priv->method_dump);
@@ -108,7 +105,7 @@ list_t * hashlist_merge(hashlist_t * this)
 void hashlist_set_copy(hashlist_t * this, void * (*method_copy)(void *))
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
-	int i;
+	unsigned int i;
 
 	for(i=0;i<priv->hash_size;i++)
 		priv->chain[i]->set_copy(priv->chain[i], method_copy);
@@ -123,7 +120,7 @@ hashlist_t * create_hashlist(
 {
 	priv_hashlist_t * private;
 	hashlist_t * public;
-	int i;
+	unsigned int i;
 
 	private = malloc(sizeof(priv_hashlist_t) + sizeof(list_t *) * hash_size);
 	public = &private->public;

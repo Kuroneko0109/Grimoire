@@ -2,6 +2,8 @@
 #include <libgrimoire/datastructure/list.h>
 #include <libgrimoire/datastructure/iterator.h>
 
+#include <memory.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <pcap.h>
 
@@ -36,21 +38,25 @@ int pkt_collector_init(pkt_collector_t * this)
 	priv->pcap = pcap_open_live(dev, sizeof(priv->buffer), 1, 1000, errbuf);
 	printf("%s\n", errbuf);
 
+	memset(&fp, 0, sizeof(fp));
 	ret = pcap_compile(priv->pcap, &fp, NULL, 0, 0);
-	pcap_datalink(priv->pcap);
+//	pcap_datalink(priv->pcap);
+
+	return ret;
 }
 
-int pkt_collector_gather(pkt_collector_t * this)
+pkt_profile_t * pkt_collector_gather(pkt_collector_t * this)
 {
 	priv_pkt_collector_t * priv = (priv_pkt_collector_t *)this;
 	uint8_t * pkt;
 	struct pcap_pkthdr hdr;
+	pkt_profile_t * profile = NULL;
 
 	pkt = pcap_next(priv->pcap, &hdr);
 	if(pkt)
-		memcpy(priv->buffer, pkt, hdr.len);
+		profile = create_pkt_profile(pkt, &hdr, NULL);
 
-	return hdr.len;
+	return profile;
 }
 
 void pkt_collector_watch_device(pkt_collector_t * this, char * devname)

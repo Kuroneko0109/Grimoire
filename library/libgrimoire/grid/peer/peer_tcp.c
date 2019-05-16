@@ -71,7 +71,7 @@ ssize_t peer_write_tcp(peer_t * this, void * src, size_t size)
 
 void peer_destroy_tcp(peer_t * this)
 {
-	priv_peer_t * priv = (priv_peer_t *)this;
+//	priv_peer_t * priv = (priv_peer_t *)this;
 
 	this->close(this);
 

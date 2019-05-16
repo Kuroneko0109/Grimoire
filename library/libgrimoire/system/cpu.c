@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include <libgrimoire/config/config.h>
 #include <libgrimoire/system/cpu.h>
@@ -30,7 +32,7 @@ void cpu_dump_info(void)
 	thread_t * thread;
 	int i;
 	printf("======== Dump CPU Info ========\n");
-	printf("Core Mapping : 0x%08X\n", cpu.core_mapping);
+	printf("Core Mapping : 0x%08lX\n", cpu.core_mapping);
 	for(i=0;i<cpu.core_num;i++)
 	{
 		thread = cpu.core_thread[i];
@@ -45,10 +47,8 @@ void cpu_task_register(task_t * task, int core_idx)
 {
 	thread_t * thread = cpu.core_thread[core_idx];
 
-	if(thread)
+	if(NULL != thread)
 		thread->task_register(thread, task);
-	else
-		;
 }
 
 void cpu_drive(void)

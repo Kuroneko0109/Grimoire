@@ -9,17 +9,28 @@ typedef struct priv_analyzer priv_analyzer_t;
 struct priv_analyzer {
 	analyzer_t public;
 
+	int (*select_layer)(analyzer_t * this, void * pkt, int pkt_len);
+
 	hashlist_t * hashlist;
 };
+
+int analyzer_select_layer(analyzer_t * this, void * pkt)
+{
+	return 0;
+}
 
 void analyzer_input(analyzer_t * this, pkt_profile_t * profile)
 {
 	priv_analyzer_t * priv = (priv_analyzer_t *)this;
 }
 
-void analyzer_hasher(void * data)
+unsigned int analyzer_hasher(void * data)
 {
 	pkt_profile_t * profile = (pkt_profile_t *)data;
+
+	// l3 five tuple? else... select l2?
+
+	return 0;
 }
 
 analyzer_t * create_analyzer(void)

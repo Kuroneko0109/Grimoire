@@ -2,6 +2,8 @@
 #include <libgrimoire/nlp/knowledge.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 
 typedef struct _knowledge priv_knowledge_t;
 struct _knowledge {
@@ -53,12 +55,13 @@ void knowledge_dump(knowledge_t * this)
 	merged->count(merged);
 }
 
-unsigned int knowledge_string_hasher(char * string)
+unsigned int knowledge_string_hasher(void * data)
 {
+	char * string = data;
 	int i;
 	int j;
 	unsigned int ret = 0;
-	char * p = &ret;
+	char * p = (char *)&ret;
 	int len = strlen(string);
 
 	j = 0;

@@ -195,9 +195,6 @@ void list_dump(list_t * this)
 {
 	priv_list_t * priv = (priv_list_t *)this;
 
-	node_t * node;
-	int i=0;
-
 	printf("list dump\n");
 	printf("head : %p, tail : %p\n", priv->head, priv->tail);
 //	for(node=priv->head;node;node=node->get_rear(node))
@@ -241,7 +238,7 @@ int list_count(list_t * this)
 	return i;
 }
 
-void * list_set_copy(list_t * this, void * (*method_copy)(void *))
+void list_set_copy(list_t * this, void * (*method_copy)(void *))
 {
 	priv_list_t * priv = (priv_list_t *)this;
 	priv->method_copy = method_copy;
