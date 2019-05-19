@@ -9,8 +9,6 @@ typedef struct priv_analyzer priv_analyzer_t;
 struct priv_analyzer {
 	analyzer_t public;
 
-	int (*select_layer)(analyzer_t * this, void * pkt, int pkt_len);
-
 	hashlist_t * hashlist;
 };
 
@@ -40,6 +38,8 @@ analyzer_t * create_analyzer(void)
 
 	private = malloc(sizeof(priv_analyzer_t));
 	public = &private->public;
+
+//	private->ether = create_ether_analyzer();
 
 	private->hashlist = create_hashlist(analyzer_hasher, 256, NULL, NULL, NULL);
 

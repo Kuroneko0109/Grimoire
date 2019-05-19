@@ -1,10 +1,6 @@
 OBJS = $(patsubst %.c, %.o, $(wildcard *.c))
-DIRS = analyzer
 
-all :	$(OBJS) $(DIRS)
-
-$(DIRS) :
-	$(MAKE) -C $@
+all :	$(OBJS)
 
 .c.o :
 	@$(CC) $(CFLAGS) -o $@ $<
@@ -13,4 +9,4 @@ $(DIRS) :
 clean :
 	@rm -f *.o
 
-.PHONY: clean all $(DIRS)
+.PHONY: clean all
