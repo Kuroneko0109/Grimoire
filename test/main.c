@@ -9,12 +9,11 @@
 #include <libgrimoire/nlp/knowledge.h>
 #include <libgrimoire/config/config.h>
 #include <libgrimoire/system/cpu.h>
-#include <libgrimoire/network/pkt_collector.h>
 
 #include <jansson.h>
 #include <iconv.h>
 
-#if 1
+#if 0
 int main(int argc, char * argv[])
 {
 	pkt_collector_t * clt;

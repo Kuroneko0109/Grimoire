@@ -8,17 +8,17 @@ export LIBRARY_ARCHIVE
 export OUTPUT_GLOBAL
 
 all : library program
-	@$(MAKE) -C $(OUTPUT_GLOBAL)
+	@$(MAKE) -s -C $(OUTPUT_GLOBAL)
 
 include $(TOP_DIR)/build.mk
 
 library : output
-	@$(MAKE) -C $(LIBRARY)
+	@$(MAKE) -s -C $(LIBRARY)
 
 clean :
 	@for dir in test $(OUTPUT_GLOBAL) $(LIBRARY);	\
 	do	\
-		$(MAKE) -C $$dir clean;	\
+		$(MAKE) -s -C $$dir clean;	\
 	done
 	@rm -rf $(OUTPUT_GLOBAL)
 

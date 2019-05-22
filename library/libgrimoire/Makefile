@@ -1,13 +1,15 @@
-BUILD_DIR = grid common config datastructure system delivery chrono math nlp network #security
+BUILD_DIR = grid common config datastructure system delivery chrono math nlp #security
 
 all : $(BUILD_DIR)
 
 $(BUILD_DIR) :
+	@echo " ====== Build $@ ======"
 	@$(MAKE) -C $@
 
 clean :
 	@for dir in $(BUILD_DIR) ;	\
 	do	\
+		echo " ====== clean $$dir ======";	\
 		$(MAKE) -C $$dir clean;	\
 	done
 
