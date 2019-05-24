@@ -170,7 +170,7 @@ thread_t * create_thread(list_t * task_list)
 
 	private->thread_driver = thread_invoke;
 
-	thread_core_bind(public, 0);
+	public->core_bind(public, 0);
 
 	public->dump(public);
 

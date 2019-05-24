@@ -9,7 +9,7 @@ typedef struct priv_task priv_task_t;
 struct priv_task {
 	task_t public;
 
-	char * task_name;
+	char task_name[32];
 	void * (*func)(void *);
 	void (*destroyer)(void *);
 	void * param;
@@ -71,7 +71,7 @@ task_t * create_task(char * task_name, void * (*func)(void *), void * param, voi
 	private = malloc(sizeof(priv_task_t));
 	public = &private->public;
 
-	private->task_name = task_name;
+	strcpy(private->task_name, task_name);
 	private->func = func;
 	private->param = param;
 	private->destroyer = destroyer;
