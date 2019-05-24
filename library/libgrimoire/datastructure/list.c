@@ -148,6 +148,7 @@ void * list_dequeue_data(list_t * this)
 	node = this->dequeue_node(this);
 	if(node)
 	{
+		printf("%s(%d)\n", __func__, __LINE__);
 		data = node->get_data(node);
 		node->set_data(node, NULL);
 		node->destroy(node);
@@ -168,7 +169,7 @@ node_t * list_dequeue_node(list_t * this)
 	if(!priv->head)
 		priv->tail = NULL;
 
-	return NULL;
+	return node;
 }
 
 int list_lock(list_t * this)
