@@ -143,12 +143,15 @@ node_t * list_enqueue_node(list_t * this, node_t * node)
 void * list_dequeue_data(list_t * this)
 {
 	node_t * node;
-	void * data;
+	void * data = NULL;
 
 	node = this->dequeue_node(this);
-	data = node->get_data(node);
-	node->set_data(node, NULL);
-	node->destroy(node);
+	if(node)
+	{
+		data = node->get_data(node);
+		node->set_data(node, NULL);
+		node->destroy(node);
+	}
 
 	return data;
 }
