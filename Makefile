@@ -1,7 +1,7 @@
 TOP_DIR = $(shell pwd)
 LIBRARY = $(TOP_DIR)/library
 OUTPUT_GLOBAL = $(shell pwd)/output
-LIBRARY_ARCHIVE = $(OUTPUT_GLOBAL)/grimoire
+LIBRARY_ARCHIVE += $(OUTPUT_GLOBAL)/grimoire
 export TOP_DIR
 export LIBRARY
 export LIBRARY_ARCHIVE
