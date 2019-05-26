@@ -148,7 +148,6 @@ void * list_dequeue_data(list_t * this)
 	node = this->dequeue_node(this);
 	if(node)
 	{
-		printf("%s(%d)\n", __func__, __LINE__);
 		data = node->get_data(node);
 		node->set_data(node, NULL);
 		node->destroy(node);
