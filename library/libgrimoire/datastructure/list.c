@@ -227,6 +227,9 @@ void list_flush(list_t * this)
 		node = node->get_rear(node);
 		tmp->destroy(tmp);
 	}
+
+	priv->head = NULL;
+	priv->tail = NULL;
 }
 
 int list_count(list_t * this)
