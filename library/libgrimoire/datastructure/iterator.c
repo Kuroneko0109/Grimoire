@@ -44,7 +44,7 @@ void iterator_destroy(iterator_t * this)
 
 	if(priv->cache_flag)
 	{
-		printf("%s(%d) Cache Iterator can't destroy.\n", __func__, __LINE__);
+//		printf("%s(%d) Cache Iterator can't destroy.\n", __func__, __LINE__);
 		return;
 	}
 
@@ -59,7 +59,11 @@ void * iterator_next(iterator_t * this)
 	priv_iterator_t * priv = (priv_iterator_t *)this;
 	void * ret;
 	if(priv->index == priv->count)
+	{
+		// null 반환 이후에 재실행하면 다시 처음부터 다시 반복해준다.
+		priv->index = 0;
 		return NULL;
+	}
 
 	ret = priv->table[priv->index];
 	priv->index++;

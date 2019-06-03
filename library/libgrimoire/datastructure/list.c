@@ -31,7 +31,12 @@ iterator_t * list_get_iterator(list_t * this)
 {
 	priv_list_t * priv = (priv_list_t *)this;
 	if(priv->using_iterator_cache)
+	{
+		if(NULL == priv->cache)
+			this->iterator_sync(this);
+
 		return priv->cache;
+	}
 
 	return this->create_iterator(this);
 }
@@ -134,6 +139,11 @@ void list_iterator_sync(list_t * this)
 			priv->cache->destroy(priv->cache);
 
 			/* create한다음엔 다시 캐시플래그 세워줌. 외부에서 실수로 Destroy해도 안사라짐. */
+			priv->cache = this->create_iterator(this);
+			priv->cache->using_cache(priv->cache, 1);
+		}
+		else
+		{
 			priv->cache = this->create_iterator(this);
 			priv->cache->using_cache(priv->cache, 1);
 		}
@@ -345,6 +355,7 @@ list_t * create_list(
 	private->method_dump = method_dump;
 	private->lock = create_lock();
 	private->cache = NULL;
+	private->using_iterator_cache = 0;
 
 	public->iterator_sync = list_iterator_sync;
 	public->set_copy = list_set_copy;
