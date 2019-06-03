@@ -9,6 +9,7 @@ struct iterator {
 	void * (*get_data)(iterator_t * this, int index);
 	void (*set_data)(iterator_t * this, void * data, int index);
 	void * (*next)(iterator_t * this);
+	void (*using_cache)(iterator_t * this, int flag);
 };
 
 iterator_t * create_iterator(int count);

@@ -22,9 +22,21 @@ struct priv_list {
 	void * (*method_dump)(void *);
 
 	lock_t * lock;
+
+	int using_iterator_cache;
+	iterator_t * cache;
 };
 
 iterator_t * list_get_iterator(list_t * this)
+{
+	priv_list_t * priv = (priv_list_t *)this;
+	if(priv->using_iterator_cache)
+		return priv->cache;
+
+	return this->create_iterator(this);
+}
+
+iterator_t * list_create_iterator(list_t * this)
 {
 	priv_list_t * priv = (priv_list_t *)this;
 	iterator_t * iterator;
@@ -109,6 +121,25 @@ node_t * list_detach(list_t * this, node_t * node)
 	return node;
 }
 
+void list_iterator_sync(list_t * this)
+{
+	priv_list_t * priv = (priv_list_t *)this;
+
+	if(priv->using_iterator_cache)
+	{
+		if(NULL != priv->cache)
+		{
+			/* iterator에 캐시플래그 없애줘야 디스트로이할때 진짜 없어짐. */
+			priv->cache->using_cache(priv->cache, 0);
+			priv->cache->destroy(priv->cache);
+
+			/* create한다음엔 다시 캐시플래그 세워줌. 외부에서 실수로 Destroy해도 안사라짐. */
+			priv->cache = this->create_iterator(this);
+			priv->cache->using_cache(priv->cache, 1);
+		}
+	}
+}
+
 node_t * list_enqueue_data(list_t * this, void * data)
 {
 	priv_list_t * priv = (priv_list_t *)this;
@@ -136,6 +167,8 @@ node_t * list_enqueue_node(list_t * this, node_t * node)
 		priv->head = node;
 		priv->tail = node;
 	}
+
+	this->iterator_sync(this);
 
 	return node;
 }
@@ -167,6 +200,8 @@ node_t * list_dequeue_node(list_t * this)
 	priv->head = node->get_rear(node);
 	if(!priv->head)
 		priv->tail = NULL;
+
+	this->iterator_sync(this);
 
 	return node;
 }
@@ -282,6 +317,13 @@ void list_sort(list_t * this)
 	iterator->destroy(iterator);
 }
 
+void list_using_iterator_cache(list_t * this, int using)
+{
+	priv_list_t * priv = (priv_list_t *)this;
+
+	priv->using_iterator_cache = using;
+}
+
 list_t * create_list(
 		void * (*method_destroyer)(void *),
 		int (*method_compare)(void *, void *),
@@ -302,10 +344,13 @@ list_t * create_list(
 	private->method_sort = NULL;
 	private->method_dump = method_dump;
 	private->lock = create_lock();
+	private->cache = NULL;
 
+	public->iterator_sync = list_iterator_sync;
 	public->set_copy = list_set_copy;
 	public->count = list_count;
 	public->get_iterator = list_get_iterator;
+	public->create_iterator = list_create_iterator;
 	public->find = list_find;
 	public->find_data = list_find_data;
 	public->enqueue_data = list_enqueue_data;
@@ -321,6 +366,7 @@ list_t * create_list(
 	public->dump = list_dump;
 	public->flush = list_flush;
 	public->destroy = list_destroy;
+	public->using_iterator_cache = list_using_iterator_cache;
 
 	return public;
 }

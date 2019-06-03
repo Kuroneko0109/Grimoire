@@ -11,6 +11,8 @@ struct priv_iterator {
 	int index;
 
 	void ** table;
+
+	int cache_flag;
 };
 
 void * iterator_get_data(iterator_t * this, int index)
@@ -40,6 +42,12 @@ void iterator_destroy(iterator_t * this)
 {
 	priv_iterator_t * priv = (priv_iterator_t *)this;
 
+	if(priv->cache_flag)
+	{
+		printf("%s(%d) Cache Iterator can't destroy.\n", __func__, __LINE__);
+		return;
+	}
+
 	if(priv->table)
 		free(priv->table);
 
@@ -58,6 +66,13 @@ void * iterator_next(iterator_t * this)
 	return ret;
 }
 
+void iterator_using_cache(iterator_t * this, int cache_flag)
+{
+	priv_iterator_t * priv = (priv_iterator_t *)this;
+
+	priv->cache_flag = cache_flag;
+}
+
 iterator_t * create_iterator(int count)
 {
 	priv_iterator_t * private;
@@ -70,6 +85,7 @@ iterator_t * create_iterator(int count)
 	public->get_data = iterator_get_data;
 	public->set_data = iterator_set_data;
 	public->next = iterator_next;
+	public->using_cache = iterator_using_cache;
 
 	private->count = count;
 	private->index = 0;

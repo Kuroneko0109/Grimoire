@@ -8,6 +8,7 @@ typedef struct list list_t;
 
 struct list {
 	iterator_t * (*get_iterator)(list_t *);
+	iterator_t * (*create_iterator)(list_t *);
 	node_t * (*find)(list_t *, void *);
 	void * (*find_data)(list_t *, void *);
 
@@ -32,6 +33,9 @@ struct list {
 	void (*flush)(list_t *);
 	void (*destroy)(list_t *);
 	void (*dump)(list_t *);
+
+	void (*iterator_sync)(list_t *);
+	void (*using_iterator_cache)(list_t *, int);
 };
 
 list_t * create_list(
