@@ -308,6 +308,8 @@ void list_sort(list_t * this)
 	iterator_t * iterator;
 	node_t * node;
 
+	void * data;
+
 	int count;
 	int i;
 
@@ -323,6 +325,13 @@ void list_sort(list_t * this)
 
 	if(priv->method_sort)
 		priv->method_sort(iterator, priv->method_compare);
+
+	while(this->dequeue_data(this))
+		;
+	while(iterator->next(iterator))
+		;
+	while((data = iterator->next(iterator)))
+		this->enqueue_data(this, data);
 
 	iterator->destroy(iterator);
 }
