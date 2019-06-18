@@ -16,10 +16,12 @@ struct priv_list {
 	node_t * tail;
 
 	void * (*method_destroyer)(void *);
-	int (*method_compare)(void *, void *);
+	int (*method_compare_element)(void *, void *);
 	void (*method_sort)(iterator_t *, int (*)(void *, void *));
 	void * (*method_copy)(void *);
 	void * (*method_dump)(void *);
+
+	int (*method_homomorphism)(list_t *, list_t *);
 
 	lock_t * lock;
 
@@ -75,12 +77,12 @@ node_t * list_find(list_t * this, void * sample)
 	priv_list_t * priv = (priv_list_t *)this;
 	node_t * node;
 
-	if(NULL == priv->method_compare)
+	if(NULL == priv->method_compare_element)
 		return NULL;
 
 	for(node=priv->head;node;node=node->get_rear(node))
 	{
-		if(0 == priv->method_compare(node->get_data(node), sample))
+		if(0 == priv->method_compare_element(node->get_data(node), sample))
 			break;
 	}
 
@@ -324,7 +326,7 @@ void list_sort(list_t * this)
 	}
 
 	if(priv->method_sort)
-		priv->method_sort(iterator, priv->method_compare);
+		priv->method_sort(iterator, priv->method_compare_element);
 
 	while(this->dequeue_data(this))
 		;
@@ -343,9 +345,29 @@ void list_using_iterator_cache(list_t * this, int using)
 	priv->using_iterator_cache = using;
 }
 
+void list_set_homomorphism(list_t * this, int (*method_homomorphism)(list_t *, list_t *))
+{
+	priv_list_t * priv = (priv_list_t *)this;
+
+	priv->method_homomorphism = method_homomorphism;
+}
+
+int list_homomorphism(list_t * this, list_t * list_obj)
+{
+	priv_list_t * priv = (priv_list_t *)this;
+	int ret = -1;
+
+	if(priv->method_homomorphism)
+	{
+		ret = priv->method_homomorphism(this, list_obj);
+	}
+
+	return ret;
+}
+
 list_t * create_list(
 		void * (*method_destroyer)(void *),
-		int (*method_compare)(void *, void *),
+		int (*method_compare_element)(void *, void *),
 		void * (*method_dump)(void *))
 {
 	priv_list_t * private;
@@ -358,7 +380,7 @@ list_t * create_list(
 	private->tail = NULL;
 
 	private->method_destroyer = method_destroyer;
-	private->method_compare = method_compare;
+	private->method_compare_element = method_compare_element;
 	private->method_copy = NULL;
 	private->method_sort = NULL;
 	private->method_dump = method_dump;
@@ -387,6 +409,8 @@ list_t * create_list(
 	public->flush = list_flush;
 	public->destroy = list_destroy;
 	public->using_iterator_cache = list_using_iterator_cache;
+	public->set_homomorphism = list_set_homomorphism;
+	public->homomorphism = list_homomorphism;
 
 	return public;
 }
