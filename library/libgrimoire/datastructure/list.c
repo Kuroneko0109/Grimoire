@@ -21,7 +21,7 @@ struct priv_list {
 	void * (*method_copy)(void *);
 	void * (*method_dump)(void *);
 
-	int (*method_homomorphism)(list_t *, list_t *);
+	int (*method_likely)(list_t *, list_t *);
 
 	lock_t * lock;
 
@@ -345,21 +345,21 @@ void list_using_iterator_cache(list_t * this, int using)
 	priv->using_iterator_cache = using;
 }
 
-void list_set_homomorphism(list_t * this, int (*method_homomorphism)(list_t *, list_t *))
+void list_set_likely(list_t * this, int (*method_likely)(list_t *, list_t *))
 {
 	priv_list_t * priv = (priv_list_t *)this;
 
-	priv->method_homomorphism = method_homomorphism;
+	priv->method_likely = method_likely;
 }
 
-int list_homomorphism(list_t * this, list_t * list_obj)
+int list_likely(list_t * this, list_t * list_obj)
 {
 	priv_list_t * priv = (priv_list_t *)this;
 	int ret = -1;
 
-	if(priv->method_homomorphism)
+	if(priv->method_likely)
 	{
-		ret = priv->method_homomorphism(this, list_obj);
+		ret = priv->method_likely(this, list_obj);
 	}
 
 	return ret;
@@ -409,8 +409,8 @@ list_t * create_list(
 	public->flush = list_flush;
 	public->destroy = list_destroy;
 	public->using_iterator_cache = list_using_iterator_cache;
-	public->set_homomorphism = list_set_homomorphism;
-	public->homomorphism = list_homomorphism;
+	public->set_likely = list_set_likely;
+	public->likely = list_likely;
 
 	return public;
 }

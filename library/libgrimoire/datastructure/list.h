@@ -38,8 +38,8 @@ struct list {
 	void (*using_iterator_cache)(list_t *, int);
 
 	/* 판별 시, 각 리스트에 대해 모두 lock이 되어있어야 한다. */
-	void (*set_homomorphism)(list_t *, int (*)(list_t *, list_t *));
-	int (*homomorphism)(list_t *, list_t *);
+	void (*set_likely)(list_t *, int (*)(list_t *, list_t *));
+	int (*likely)(list_t *, list_t *);
 };
 
 list_t * create_list(
