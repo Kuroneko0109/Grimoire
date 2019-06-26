@@ -256,7 +256,10 @@ void list_dump(list_t * this)
 
 void list_destroy(list_t * this)
 {
+	priv_list_t * priv = (priv_list_t *)this;
 	this->flush(this);
+
+	priv->lock->destroy(priv->lock);
 
 	free(this);
 }

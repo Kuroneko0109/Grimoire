@@ -30,6 +30,8 @@ void lock_destroy(lock_t * this)
 	priv_lock_t * priv = (priv_lock_t *)this;
 
 	pthread_mutex_destroy(&priv->mutex);
+
+	free(this);
 }
 
 lock_t * create_lock(void)
