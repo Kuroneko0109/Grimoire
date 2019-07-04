@@ -32,10 +32,10 @@ struct priv_config {
 void config_parser(config_t * config)
 {
 	priv_config_t * priv = (priv_config_t *)config;
-	char str[128];
+	char str[256];
 
-	char key[32];
-	char val[64];
+	char key[64];
+	char val[192];
 
 	char * ptr = priv->buffer;
 	int i;
@@ -43,20 +43,22 @@ void config_parser(config_t * config)
 	ptr = strtok(priv->buffer, "\n");
 	while(ptr)
 	{
-		strcpy(str, ptr);
-		memset(key, 0, sizeof(key));
-		memset(val, 0, sizeof(val));
+		if(ptr[0] != '#')
+		{
+			strcpy(str, ptr);
+			memset(key, 0, sizeof(key));
+			memset(val, 0, sizeof(val));
 
-		for(i=0;str[i]!='=';i++)
-			key[i] = str[i];	// strcpy for front '='
-		i++;	// next '='
-		strcpy(val, str+i);
+			for(i=0;str[i]!='=';i++)
+				key[i] = str[i];	// strcpy for front '='
+			i++;	// next '='
+			strcpy(val, str+i);
 
-		if('\0' == key[0] || '\0' == val[0])
-			printf("Invalid config line(%s)\n", str);
-		else
-			priv->list->enqueue_data(priv->list, create_config_element(key, val));
-
+			if('\0' == key[0] || '\0' == val[0])
+				printf("Invalid config line(%s)\n", str);
+			else
+				priv->list->enqueue_data(priv->list, create_config_element(key, val));
+		}
 		ptr = strtok(NULL, "\n");
 	}
 }

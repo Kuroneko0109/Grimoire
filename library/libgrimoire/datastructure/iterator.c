@@ -42,6 +42,8 @@ void iterator_destroy(iterator_t * this)
 {
 	priv_iterator_t * priv = (priv_iterator_t *)this;
 
+	priv->index = 0;
+
 	if(priv->cache_flag)
 	{
 //		printf("%s(%d) Cache Iterator can't destroy.\n", __func__, __LINE__);

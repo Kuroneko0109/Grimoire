@@ -13,7 +13,19 @@
 #include <jansson.h>
 #include <iconv.h>
 
-#if 0
+#if 1
+int main(int argc, char * argv[])
+{
+	config_t * config;
+	config = create_config(argv[1], 8192);
+
+	init_cpu(config);
+
+	cpu_t * cpu = get_global_cpu();
+
+	return 0;
+}
+#elif 0
 int main(int argc, char * argv[])
 {
 	pkt_collector_t * clt;
