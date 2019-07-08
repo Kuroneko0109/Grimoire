@@ -114,17 +114,23 @@ void thread_dump(thread_t * this)
 {
 	priv_thread_t * priv = (priv_thread_t *)this;
 	list_t * task_list = priv->task_list;
+	iterator_t * iterator;
+	task_t * task;
 
-	printf("%s(%d)\n", __func__, __LINE__);
 #if 0
 	printf("Thread Info -> cpu : %x\n",
 			pthread_getaffinity_np(
 				priv->pthread,
 				sizeof(cpu_set_t),
 				&priv->cpuset));
-	printf("%s(%d)\n", __func__, __LINE__);
 #endif
 	task_list->lock(task_list);
+	iterator = task_list->get_iterator(task_list);
+
+	while((task = iterator->next(iterator)))
+		task->dump(task);
+
+	iterator->destroy(iterator);
 	task_list->unlock(task_list);
 }
 

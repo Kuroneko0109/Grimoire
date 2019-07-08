@@ -13,7 +13,7 @@ struct cpu {
 	void (*drive)(void);
 };
 
-void init_cpu(config_t *);
+int init_cpu(config_t *);
 
 cpu_t * get_global_cpu(void);
 

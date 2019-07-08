@@ -14,19 +14,27 @@
 #include <iconv.h>
 
 #if 1
+
+void * aaaa(void * param)
+{
+	return NULL;
+}
+
 int main(int argc, char * argv[])
 {
 	config_t * config;
 	config = create_config(argv[1], 8192);
 
+	task_t * task;
+
 	init_cpu(config);
 
-	get_global_cpu()->drive();
+	task = create_task("test_task", aaaa, NULL, NULL);
+	task->timer_init(task);
+	task->set_period(task, 1000000);
+	get_global_cpu()->task_register(task, 2);
 
-	while(1)
-	{
-		sleep(10000);
-	}
+	get_global_cpu()->drive();
 
 	return 0;
 }

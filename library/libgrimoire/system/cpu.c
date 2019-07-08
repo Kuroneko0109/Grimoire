@@ -49,6 +49,8 @@ void cpu_task_register(task_t * task, int core_idx)
 
 	if(NULL != thread)
 		thread->task_register(thread, task);
+	else
+		printf("Unassigned core index %d\n", core_idx);
 }
 
 void cpu_drive(void)
@@ -65,12 +67,13 @@ void cpu_drive(void)
 
 	for(i=0;1;i++)
 	{
-		printf("\n%d seconds...\n\n", i);
+		printf("\n%d seconds...\n", i);
+		cpu.public.dump_info();
 		sleep(1);
 	}
 }
 
-void init_cpu(config_t * config)
+int init_cpu(config_t * config)
 {
 	int i;
 	char * core_bitmask;
@@ -82,7 +85,7 @@ void init_cpu(config_t * config)
 	if(NULL == core_bitmask || NULL == core_maxcount)
 	{
 		printf("%s(%d) : Can't get value\n", __func__, __LINE__);
-		return;
+		return -1;
 	}
 
 	cpu.core_num = atoi(core_maxcount);
@@ -104,4 +107,6 @@ void init_cpu(config_t * config)
 	cpu.public.drive = cpu_drive;
 	cpu.public.task_register = cpu_task_register;
 	cpu.public.dump_info = cpu_dump_info;
+
+	return 0;
 }
