@@ -21,7 +21,12 @@ int main(int argc, char * argv[])
 
 	init_cpu(config);
 
-	cpu_t * cpu = get_global_cpu();
+	get_global_cpu()->drive();
+
+	while(1)
+	{
+		sleep(10000);
+	}
 
 	return 0;
 }

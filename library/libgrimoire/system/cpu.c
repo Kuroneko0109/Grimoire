@@ -93,7 +93,7 @@ void init_cpu(config_t * config)
 	{
 		if(cpu.core_mapping & (1<<i))	// using core filtering
 		{
-			thread = create_thread(create_list(NULL, NULL, NULL));
+			thread = create_thread(NULL);
 			thread->core_bind(thread, i);
 			cpu.core_thread[i] = thread;
 		}

@@ -95,7 +95,7 @@ int thread_run(thread_t * this)
 	priv->pthread_id = pthread_create(
 			&priv->pthread, NULL, priv->thread_driver, priv);
 
-	pthread_setaffinity_np(&priv->pthread,
+	pthread_setaffinity_np(priv->pthread,
 			sizeof(cpu_set_t),
 			&priv->cpuset);
 
