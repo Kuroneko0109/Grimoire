@@ -111,7 +111,7 @@ file_t * create_file(const char * filename)
 	private->fd = -1;
 	private->flags = O_RDWR | O_CREAT;
 	private->permission = 0644;
-	private->lock = create_lock();
+	private->lock = create_lock(LOCK_SPINLOCK);
 
 	public->exist = file_exist;
 	public->creat = file_creat;

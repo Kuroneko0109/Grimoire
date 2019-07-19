@@ -387,7 +387,7 @@ list_t * create_list(
 	private->method_copy = NULL;
 	private->method_sort = NULL;
 	private->method_dump = method_dump;
-	private->lock = create_lock();
+	private->lock = create_lock(LOCK_SPINLOCK);
 	private->cache = NULL;
 	private->using_iterator_cache = 0;
 
