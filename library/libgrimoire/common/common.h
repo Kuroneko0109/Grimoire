@@ -20,4 +20,20 @@
 void trimnl(char * str);
 void binary_dump(char * title, uint8_t * buffer, int size);
 
+typedef struct logger logger_t;
+struct logger {
+#define LOG_ERROR	(0)
+#define LOG_CRITICAL	(1)
+#define LOG_WARNING	(2)
+#define LOG_NOTICE	(3)
+#define LOG_INFO	(4)
+#define LOG_DEBUG	(5)
+	int (*log)(logger_t *, int, const char *, ...);
+
+	void (*set_level)(logger_t *, int);
+	void (*set_method)(logger_t *, const char *);
+};
+
+logger_t * create_logger(void);
+
 #endif
