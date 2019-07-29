@@ -62,23 +62,28 @@ int logger_log(logger_t * this, int level, const char * fmt, ...)
 	priv_logger_t * priv = (priv_logger_t *)this;
 
 	va_list list;
-	char * buffer;
+	char * buffer1;
+	char * buffer2;
 	int ret;
 
 	if(level > priv->level)
 		return -1;
 
-	buffer = malloc(8192);
-	strcpy(buffer, msg_head[level]);
-	strcat(buffer, fmt);
+	buffer1 = malloc(8192);
+
+	buffer2 = buffer1 + 4096;
+	memset(buffer2, 0, 4096);
+
+	strcpy(buffer1, msg_head[level]);
+	strcat(buffer1, fmt);
 
 	va_start(list, fmt);
-	vsprintf(buffer, buffer, list);
+	vsprintf(buffer2, buffer1, list);
 	va_end(list);
-	strcat(buffer, "\n");
+	strcat(buffer2, "\n");
 
-	ret = priv->method(buffer);
-	free(buffer);
+	ret = priv->method(buffer2);
+	free(buffer1);
 	return ret;
 }
 
