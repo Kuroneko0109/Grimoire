@@ -1,6 +1,7 @@
 #include <libgrimoire/common/common.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
 
 void trimnl(char * str)
@@ -49,26 +50,36 @@ struct priv_logger {
 };
 
 char * msg_head[] = {
-	[LOG_ERROR] = "[ERROR]",
-	[LOG_CRITICAL] = "[CRITICAL]",
-	[LOG_WARNING] = "[WARNING]",
-	[LOG_NOTICE] = "[NOTICE]",
-	[LOG_INFO] = "[INFO]",
-	[LOG_DEBUG] = "[DEBUG]",
+	[LOG_ERROR] = "[ERROR] ",
+	[LOG_CRITICAL] = "[CRITICAL] ",
+	[LOG_WARNING] = "[WARNING] ",
+	[LOG_NOTICE] = "[NOTICE] ",
+	[LOG_INFO] = "[INFO] ",
+	[LOG_DEBUG] = "[DEBUG] ",
 };
 int logger_log(logger_t * this, int level, const char * fmt, ...)
 {
 	priv_logger_t * priv = (priv_logger_t *)this;
-	char * buffer;
 
-	if(level < priv->level)
+	va_list list;
+	char * buffer;
+	int ret;
+
+	if(level > priv->level)
 		return -1;
 
-	buffer = malloc(strlen(fmt) + strlen(msg_head[level]));
-	strcpy(buffer, fmt);
-	strcat(buffer, msg_head[level]);
+	buffer = malloc(8192);
+	strcpy(buffer, msg_head[level]);
+	strcat(buffer, fmt);
 
-	return priv->method(fmt, __VA_ARGS__);
+	va_start(list, fmt);
+	vsprintf(buffer, buffer, list);
+	va_end(list);
+	strcat(buffer, "\n");
+
+	ret = priv->method(buffer);
+	free(buffer);
+	return ret;
 }
 
 void logger_set_level(logger_t * this, int level)
@@ -87,6 +98,7 @@ logger_t * create_logger(void)
 	public = &private->public;
 
 	private->level = 0;
+	private->method = printf;
 
 	public->log = logger_log;
 	public->set_level = logger_set_level;

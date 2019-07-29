@@ -9,6 +9,7 @@
 #include <libgrimoire/nlp/knowledge.h>
 #include <libgrimoire/config/config.h>
 #include <libgrimoire/system/cpu.h>
+#include <libgrimoire/common/common.h>
 
 #include <jansson.h>
 #include <iconv.h>
@@ -27,6 +28,12 @@ int main(int argc, char * argv[])
 
 	task_t * task;
 
+	logger_t * logger = create_logger();
+	logger->set_level(logger, LOG_DEBUG);
+	logger->log(logger, LOG_INFO,  "hello world");
+	logger->log(logger, LOG_DEBUG,  "hello world");
+
+#if 0
 	init_cpu(config);
 
 	task = create_task("test_task", aaaa, NULL, NULL);
@@ -35,7 +42,7 @@ int main(int argc, char * argv[])
 	get_global_cpu()->task_register(task, 2);
 
 	get_global_cpu()->drive();
-
+#endif
 	return 0;
 }
 #elif 0
