@@ -78,7 +78,7 @@ char * config_get_value(config_t * this, char * key)
 
 	strcpy(obj.key, key);
 
-	node = priv->list->find(priv->list, &obj);
+	node = priv->list->find(priv->list, config_compare_by_key, &obj);
 	if(node)
 		return ((config_element_t *)node->get_data(node))->val;
 
@@ -126,7 +126,7 @@ config_t * create_config(char * directory, int buffer_len)
 	private->buffer_len = buffer_len;
 	private->parser = config_parser;
 	private->file = create_file(directory);
-	private->list = create_list(NULL, config_compare_by_key, config_dump_element);
+	private->list = create_list(NULL, config_dump_element);
 	memset(private->buffer, 0, private->buffer_len);
 
 	public->get_value = config_get_value;

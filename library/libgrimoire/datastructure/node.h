@@ -13,7 +13,6 @@ struct node {
 	node_t * (*set_front)(node_t * this, node_t * node);
 	node_t * (*get_rear)(node_t * this);
 	node_t * (*set_rear)(node_t * this, node_t * node);
-	void (*swap)(node_t * this, node_t * node);
 	void (*destroy)(node_t * this);
 };
 

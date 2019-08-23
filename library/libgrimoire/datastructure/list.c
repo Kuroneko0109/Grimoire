@@ -16,7 +16,6 @@ struct priv_list {
 	node_t * tail;
 
 	void * (*method_destroyer)(void *);
-	int (*method_compare_element)(void *, void *);
 	void (*method_sort)(iterator_t *, int (*)(void *, void *));
 	void * (*method_copy)(void *);
 	void * (*method_dump)(void *);
@@ -72,27 +71,24 @@ iterator_t * list_create_iterator(list_t * this)
 	return iterator;
 }
 
-node_t * list_find(list_t * this, void * sample)
+node_t * list_find(list_t * this, int (*compare)(void *, void *), void * sample)
 {
 	priv_list_t * priv = (priv_list_t *)this;
 	node_t * node;
 
-	if(NULL == priv->method_compare_element)
-		return NULL;
-
 	for(node=priv->head;node;node=node->get_rear(node))
 	{
-		if(0 == priv->method_compare_element(node->get_data(node), sample))
+		if(0 == compare(node->get_data(node), sample))
 			break;
 	}
 
 	return node;
 }
 
-void * list_find_data(list_t * this, void * sample)
+void * list_find_data(list_t * this, int (*compare)(void *, void *), void * sample)
 {
 	node_t * node;
-	node = this->find(this, sample);
+	node = this->find(this, compare, sample);
 
 	if(node)
 		return node->get_data(node);
@@ -307,7 +303,7 @@ void list_set_sort(list_t * this, void (*method_sort)(iterator_t *, int (*)(void
 	priv->method_sort = method_sort;
 }
 
-void list_sort(list_t * this)
+void list_sort(list_t * this, int (*compare)(void *, void *))
 {
 	priv_list_t * priv = (priv_list_t *)this;
 	iterator_t * iterator;
@@ -329,7 +325,7 @@ void list_sort(list_t * this)
 	}
 
 	if(priv->method_sort)
-		priv->method_sort(iterator, priv->method_compare_element);
+		priv->method_sort(iterator, compare);
 
 	while(this->dequeue_data(this))
 		;
@@ -370,7 +366,6 @@ int list_likely(list_t * this, list_t * list_obj)
 
 list_t * create_list(
 		void * (*method_destroyer)(void *),
-		int (*method_compare_element)(void *, void *),
 		void * (*method_dump)(void *))
 {
 	priv_list_t * private;
@@ -383,7 +378,6 @@ list_t * create_list(
 	private->tail = NULL;
 
 	private->method_destroyer = method_destroyer;
-	private->method_compare_element = method_compare_element;
 	private->method_copy = NULL;
 	private->method_sort = NULL;
 	private->method_dump = method_dump;

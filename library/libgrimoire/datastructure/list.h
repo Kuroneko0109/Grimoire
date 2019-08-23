@@ -9,8 +9,8 @@ typedef struct list list_t;
 struct list {
 	iterator_t * (*get_iterator)(list_t *);
 	iterator_t * (*create_iterator)(list_t *);
-	node_t * (*find)(list_t *, void *);
-	void * (*find_data)(list_t *, void *);
+	node_t * (*find)(list_t *, int (*)(void *, void *), void *);
+	void * (*find_data)(list_t *, int (*)(void *, void *), void *);
 
 	int (*count)(list_t *);
 
@@ -23,7 +23,7 @@ struct list {
 
 	void (*set_copy)(list_t *, void * (*)(void *));
 	void (*set_sort)(list_t *, void (*)(iterator_t *, int (*)(void *, void *)));
-	void (*sort)(list_t *);
+	void (*sort)(list_t *, int (*compare)(void *, void *));
 
 	void (*foreach)(list_t *, void * (*)(void *));
 
@@ -44,7 +44,6 @@ struct list {
 
 list_t * create_list(
 		void * (*method_destroyer)(void *),
-		int (*method_compare_element)(void *, void *),
 		void * (*method_dump)(void *));
 
 #endif

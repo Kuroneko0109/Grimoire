@@ -170,7 +170,7 @@ thread_t * create_thread(list_t * task_list)
 	public->core_bind = thread_core_bind;
 
 	if(NULL == task_list)
-		private->task_list = create_list(NULL, NULL, NULL);
+		private->task_list = create_list(NULL, NULL);
 	else
 		private->task_list = task_list;
 

@@ -12,24 +12,24 @@ struct _knowledge {
 	hashlist_t * dictionary;
 };
 
-int knowledge_input(knowledge_t * this, char * word)
-{
-	priv_knowledge_t * priv = (priv_knowledge_t *)this;
-	hashlist_t * dictionary = priv->dictionary;
-
-	if(dictionary->find_data(dictionary, word))
-		return -1;
-
-	dictionary->input_data(dictionary, word);
-	return 0;
-}
-
 int knowledge_list_compare_method(void * d, void * s)
 {
 	char * sword = s;
 	char * dword = d;
 
 	return strcmp(sword, dword);
+}
+
+int knowledge_input(knowledge_t * this, char * word)
+{
+	priv_knowledge_t * priv = (priv_knowledge_t *)this;
+	hashlist_t * dictionary = priv->dictionary;
+
+	if(dictionary->find_data(dictionary, knowledge_list_compare_method, word))
+		return -1;
+
+	dictionary->input_data(dictionary, word);
+	return 0;
 }
 
 void * knowledge_list_dump_method(void * data)
@@ -93,7 +93,6 @@ knowledge_t * create_knowledge(unsigned int hash_size)
 			knowledge_string_hasher,
 			hash_size,
 			NULL,
-			knowledge_list_compare_method,
 			knowledge_list_dump_method);
 
 	private->dictionary->set_copy(private->dictionary, knowledge_copy);

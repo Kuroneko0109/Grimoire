@@ -14,6 +14,16 @@ struct priv_delivery {
 
 priv_delivery_t * delivery_global;
 
+int delivery_mailbox_compare(void * src, void * dst)
+{
+	mailbox_t * srcbox = src;
+
+	char * src_name = srcbox->get_name(srcbox);
+	char * dst_name = dst;
+
+	return strcmp(src_name, dst_name);
+}
+
 void delivery_send_to(delivery_t * this, char * boxname, mail_t * mail)
 {
 	priv_delivery_t * priv = (priv_delivery_t *)this;
@@ -22,7 +32,7 @@ void delivery_send_to(delivery_t * this, char * boxname, mail_t * mail)
 
 	boxlist->lock(boxlist);
 
-	mailbox = boxlist->find_data(boxlist, boxname);
+	mailbox = boxlist->find_data(boxlist, delivery_mailbox_compare, boxname);
 	if(mailbox)
 		mailbox->input(mailbox, mail);
 	else
@@ -51,16 +61,6 @@ void delivery_destroy(delivery_t * this)
 	free(this);
 }
 
-int delivery_mailbox_compare(void * src, void * dst)
-{
-	mailbox_t * srcbox = src;
-
-	char * src_name = srcbox->get_name(srcbox);
-	char * dst_name = dst;
-
-	return strcmp(src_name, dst_name);
-}
-
 void __attribute__((constructor)) init_delivery(void)
 {
 	printf("Grimoire delivery initializing...\n");
@@ -70,7 +70,7 @@ void __attribute__((constructor)) init_delivery(void)
 	delivery_global->public.register_mailbox = delivery_register_mailbox;
 	delivery_global->public.destroy = delivery_destroy;
 
-	delivery_global->boxlist = create_list(NULL, delivery_mailbox_compare, NULL);
+	delivery_global->boxlist = create_list(NULL, NULL);
 }
 
 delivery_t * get_delivery_global(void)

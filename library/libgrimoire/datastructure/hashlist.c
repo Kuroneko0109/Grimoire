@@ -16,7 +16,6 @@ struct priv_hashlist {
 	list_t * chain[0];
 
 	void * (*method_destroyer)(void *);
-	int (*method_compare)(void *, void *);
 	void * (*method_dump)(void *);
 };
 
@@ -45,13 +44,13 @@ void hashlist_input_data(hashlist_t * this, void * data)
 	chain->enqueue_data(chain, data);
 }
 
-void * hashlist_find_data(hashlist_t * this, void * sample)
+void * hashlist_find_data(hashlist_t * this, int (*compare)(void *, void *), void * sample)
 {
 	priv_hashlist_t * priv = (priv_hashlist_t *)this;
 	int index = priv->hasher(this, sample);
 	list_t * chain = priv->chain[index];
 
-	return chain->find_data(chain, sample);
+	return chain->find_data(chain, compare, sample);
 }
 
 void hashlist_dump(hashlist_t * this)
@@ -85,7 +84,7 @@ list_t * hashlist_merge(hashlist_t * this)
 	unsigned int i;
 	void * data;
 
-	ret = create_list(priv->method_destroyer, priv->method_compare, priv->method_dump);
+	ret = create_list(priv->method_destroyer, priv->method_dump);
 	for(i=0;i<priv->hash_size;i++)
 	{
 		chain = priv->chain[i];
@@ -115,7 +114,6 @@ hashlist_t * create_hashlist(
 		unsigned int (*hasher)(void *),
 		unsigned int hash_size,
 		void * (*method_destroyer)(void *),
-		int (*method_compare)(void *, void *),
 		void * (*method_dump)(void *))
 {
 	priv_hashlist_t * private;
@@ -129,7 +127,6 @@ hashlist_t * create_hashlist(
 	private->_hasher = hasher;
 	private->hash_size = hash_size;
 	private->method_destroyer = method_destroyer;
-	private->method_compare = method_compare;
 	private->method_dump = method_dump;
 
 	public->input_data = hashlist_input_data;
@@ -140,7 +137,7 @@ hashlist_t * create_hashlist(
 	public->merge = hashlist_merge;
 
 	for(i=0;i<hash_size;i++)
-		private->chain[i] = create_list(method_destroyer, method_compare, method_dump);
+		private->chain[i] = create_list(method_destroyer, method_dump);
 
 	return public;
 }

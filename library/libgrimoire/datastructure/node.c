@@ -79,23 +79,6 @@ void node_destroy(node_t * this)
 	free(this);
 }
 
-void node_swap(node_t * this, node_t * dst)
-{
-	priv_node_t * priv_this = (priv_node_t *)this;
-	priv_node_t * priv_dst = (priv_node_t *)dst;
-
-	priv_node_t tmp;
-
-	tmp.data = priv_this->data;
-	tmp.destroyer = priv_this->destroyer;
-
-	priv_this->data = priv_dst->data;
-	priv_this->destroyer = priv_dst->destroyer;
-
-	priv_dst->data = tmp.data;
-	priv_dst->destroyer = tmp.destroyer;
-}
-
 node_t * create_node(void * data, void * (*destroyer)(void *))
 {
 	priv_node_t * priv;
@@ -110,7 +93,6 @@ node_t * create_node(void * data, void * (*destroyer)(void *))
 	public->get_rear = node_get_rear;
 	public->set_front = node_set_front;
 	public->set_rear = node_set_rear;
-	public->swap = node_swap;
 	public->destroy = node_destroy;
 
 	priv->front = NULL;
