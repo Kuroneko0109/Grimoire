@@ -7,8 +7,8 @@
 /*
  * Private
  */
-typedef struct _state _state_t;
-struct _state {
+typedef struct priv_state priv_state_t;
+struct priv_state {
 	state_t public;
 
 	int current_state;
@@ -26,7 +26,7 @@ struct _state {
  */
 int state_run(state_t * this, int input)
 {
-	_state_t * priv = (_state_t *)this;
+	priv_state_t * priv = (priv_state_t *)this;
 	int dimension_trans;
 
 	dimension_trans =
@@ -47,7 +47,7 @@ int state_run(state_t * this, int input)
 int state_set_arc(state_t * this, int state,
 		int input, int result)
 {
-	_state_t * priv = (_state_t *)this;
+	priv_state_t * priv = (priv_state_t *)this;
 	int dimension_trans;
 
 	dimension_trans =
@@ -61,20 +61,20 @@ int state_set_arc(state_t * this, int state,
 
 int state_set_state(state_t * this, int current_state)
 {
-	_state_t * priv = (_state_t *)this;
+	priv_state_t * priv = (priv_state_t *)this;
 	priv->current_state = current_state;
 	return priv->current_state;
 }
 
 int state_get_state(state_t * this)
 {
-	_state_t * priv = (_state_t *)this;
+	priv_state_t * priv = (priv_state_t *)this;
 	return priv->current_state;
 }
 
 void state_dump(state_t * this)
 {
-	_state_t * priv = (_state_t *)this;
+	priv_state_t * priv = (priv_state_t *)this;
 	int dimension_trans;
 	int i;
 	int j;
@@ -94,7 +94,7 @@ void state_dump(state_t * this)
 
 void state_set_state_callback(state_t * this, void (*cb)(int))
 {
-	_state_t * priv = (_state_t *)this;
+	priv_state_t * priv = (priv_state_t *)this;
 	priv->callback = cb;
 }
 
@@ -106,13 +106,13 @@ void state_destroy(state_t * this)
 struct state * create_state(int vector_state, int vector_input)
 {
 	int alloc_size;
-	_state_t * priv;
+	priv_state_t * priv;
 	state_t * public;
 	int vector_size;
 	int i;
 
 	vector_size = vector_state * vector_input;
-	alloc_size = sizeof(struct _state)
+	alloc_size = sizeof(priv_state_t)
 		+ sizeof(int) * vector_size;
 	priv = malloc(alloc_size);
 	memset(priv, 0, alloc_size);
