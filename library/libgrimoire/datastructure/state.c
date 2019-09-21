@@ -24,7 +24,7 @@ struct priv_state {
 /*
  * Transition
  */
-int state_run(state_t * this, int input)
+int state_transition(state_t * this, int input)
 {
 	priv_state_t * priv = (priv_state_t *)this;
 	int dimension_trans;
@@ -124,7 +124,7 @@ struct state * create_state(int vector_state, int vector_input)
 	public = &priv->public;
 
 	/* init public method */
-	public->run = state_run;
+	public->transition = state_transition;
 	public->set_arc = state_set_arc;
 	public->set_state = state_set_state;
 	public->get_state = state_get_state;

@@ -7,7 +7,7 @@
 typedef struct state state_t;
 struct state {
 	/* do transition */
-	int (*run)(state_t * this, int input);
+	int (*transition)(state_t * this, int input);
 
 	/* 
 	 * set transition arc
