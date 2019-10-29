@@ -29,8 +29,11 @@ struct state {
 	void (*set_state_callback)(state_t * this,
 			void (*cb)(int));
 
+	int (*is_final)(state_t * this);
+
 	/* destroy */
 	void (*destroy)(state_t * this);
+	
 };
 
 /* count of state, count of case of input */

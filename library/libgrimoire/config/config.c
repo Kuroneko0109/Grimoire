@@ -114,6 +114,15 @@ void config_reload(config_t * this)
 	priv->parser(this);
 }
 
+void config_dump(config_t * this)
+{
+	priv_config_t * priv = (priv_config_t *)this;
+
+	priv->list->lock(priv->list);
+	priv->list->dump(priv->list);
+	priv->list->unlock(priv->list);
+}
+
 config_t * create_config(char * directory, int buffer_len)
 {
 	printf("Load Config(%s)...\n", directory);
@@ -131,13 +140,13 @@ config_t * create_config(char * directory, int buffer_len)
 
 	public->get_value = config_get_value;
 	public->reload = config_reload;
+	public->dump = config_dump;
 
 	public->reload(public);
 
 	private->parser(public);
 
-	list = private->list;
-	list->dump(list);
+	public->dump(public);
 
 	return public;
 }

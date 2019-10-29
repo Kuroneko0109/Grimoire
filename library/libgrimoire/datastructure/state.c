@@ -18,7 +18,6 @@ struct priv_state {
 	int vector_input;
 	void (*callback)(int);
 	int transition_vector[0]; // vector_state * vector_input
-
 };
 
 /*
@@ -98,6 +97,27 @@ void state_set_state_callback(state_t * this, void (*cb)(int))
 	priv->callback = cb;
 }
 
+int state_is_final(state_t * this)
+{
+	priv_state_t * priv = (priv_state_t *)this;
+	int current_dimension_entry;
+	int ret;
+	int i;
+
+	ret = 0;
+	current_dimension_entry = priv->vector_input * priv->current_state;
+	for(i=0;i<priv->vector_input;i++)
+	{
+		if(0 > priv->transition_vector[current_dimension_entry+i])
+		{
+			ret = 0;
+			break;
+		}
+	}
+
+	return ret;
+}
+
 void state_destroy(state_t * this)
 {
 	free(this);
@@ -130,6 +150,7 @@ struct state * create_state(int vector_state, int vector_input)
 	public->get_state = state_get_state;
 	public->dump = state_dump;
 	public->set_state_callback = state_set_state_callback;
+	public->is_final = state_is_final;
 	public->destroy = state_destroy;
 
 	priv->callback = NULL;
