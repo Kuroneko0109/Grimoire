@@ -27,20 +27,22 @@ int state_transition(state_t * this, int input)
 {
 	priv_state_t * priv = (priv_state_t *)this;
 	int dimension_trans;
+	int ret;
 
 	dimension_trans =
 		priv->current_state * priv->vector_input + // Two-Dimension
 		input; // One-Dimension
 
-	if(priv->transition_vector[dimension_trans] >= 0)
-		priv->current_state = priv->transition_vector[dimension_trans];
+	ret = priv->transition_vector[dimension_trans];
+	if(0 <= ret)
+		priv->current_state = ret;
 //	else
 //		printf("State not assigned.\n");
 
 	if(priv->callback)
 		priv->callback(priv->current_state);
 
-	return priv->vector_state;
+	return ret;
 }
 
 int state_set_arc(state_t * this, int state,
