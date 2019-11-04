@@ -25,10 +25,6 @@ struct state {
 	/* dump arc map */
 	void (*dump)(state_t * this);
 
-	/* temp callback */
-	void (*set_state_callback)(state_t * this,
-			void (*cb)(int));
-
 	int (*is_final)(state_t * this);
 
 	/* destroy */

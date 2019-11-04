@@ -16,7 +16,6 @@ struct priv_state {
 	/* Two-dimensional vector space */
 	int vector_state;
 	int vector_input;
-	void (*callback)(int);
 	int transition_vector[0]; // vector_state * vector_input
 };
 
@@ -29,6 +28,9 @@ int state_transition(state_t * this, int input)
 	int dimension_trans;
 	int ret;
 
+	printf("%s(%d) Now input : %d\n", __func__, __LINE__, input);
+	printf("%s(%d) Now state : %d\n", __func__, __LINE__, priv->current_state);
+
 	dimension_trans =
 		priv->current_state * priv->vector_input + // Two-Dimension
 		input; // One-Dimension
@@ -36,11 +38,8 @@ int state_transition(state_t * this, int input)
 	ret = priv->transition_vector[dimension_trans];
 	if(0 <= ret)
 		priv->current_state = ret;
-//	else
-//		printf("State not assigned.\n");
 
-	if(priv->callback)
-		priv->callback(priv->current_state);
+	printf("%s(%d) Now state : %d\n", __func__, __LINE__, priv->current_state);
 
 	return ret;
 }
@@ -80,6 +79,8 @@ void state_dump(state_t * this)
 	int i;
 	int j;
 
+	printf(">>>> State dump <<<<\n");
+	printf("now state : %d\n", priv->current_state);
 	for(i=0;i<priv->vector_state;i++)
 	{
 		for(j=0;j<priv->vector_input;j++)
@@ -91,28 +92,23 @@ void state_dump(state_t * this)
 				priv->transition_vector[dimension_trans]);
 		}
 	}
-}
-
-void state_set_state_callback(state_t * this, void (*cb)(int))
-{
-	priv_state_t * priv = (priv_state_t *)this;
-	priv->callback = cb;
+	printf("<<<<        >>>>\n");
 }
 
 int state_is_final(state_t * this)
 {
 	priv_state_t * priv = (priv_state_t *)this;
 	int current_dimension_entry;
-	int ret;
+	int ret = 0;
 	int i;
 
-	ret = 0;
 	current_dimension_entry = priv->vector_input * priv->current_state;
 	for(i=0;i<priv->vector_input;i++)
 	{
-		if(0 > priv->transition_vector[current_dimension_entry+i])
+		printf("%s(%d) %d %d\n", __func__, __LINE__, priv->vector_input, priv->transition_vector[current_dimension_entry + i]);
+		if(0 <= priv->transition_vector[current_dimension_entry+i])
 		{
-			ret = 0;
+			ret = -1;
 			break;
 		}
 	}
@@ -151,11 +147,9 @@ struct state * create_state(int vector_state, int vector_input)
 	public->set_state = state_set_state;
 	public->get_state = state_get_state;
 	public->dump = state_dump;
-	public->set_state_callback = state_set_state_callback;
 	public->is_final = state_is_final;
 	public->destroy = state_destroy;
 
-	priv->callback = NULL;
 	priv->vector_state = vector_state;
 	priv->vector_input = vector_input;
 	priv->current_state = -1;
