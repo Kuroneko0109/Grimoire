@@ -13,6 +13,8 @@ struct priv_state {
 
 	int current_state;
 
+	size_t self_size;
+
 	/* Two-dimensional vector space */
 	int vector_state;
 	int vector_input;
@@ -115,6 +117,16 @@ void state_destroy(state_t * this)
 	free(this);
 }
 
+state_t * state_clone(state_t * this)
+{
+	priv_state_t * priv = (priv_state_t *)this;
+	state_t * child = malloc(priv->self_size);
+
+	memcpy(child, priv, priv->self_size);
+
+	return child;
+}
+
 struct state * create_state(int vector_state, int vector_input)
 {
 	int alloc_size;
@@ -135,6 +147,8 @@ struct state * create_state(int vector_state, int vector_input)
 
 	public = &priv->public;
 
+	priv->self_size = alloc_size;
+
 	/* init public method */
 	public->transition = state_transition;
 	public->set_arc = state_set_arc;
@@ -142,6 +156,7 @@ struct state * create_state(int vector_state, int vector_input)
 	public->get_state = state_get_state;
 	public->dump = state_dump;
 	public->is_final = state_is_final;
+	public->clone = state_clone;
 	public->destroy = state_destroy;
 
 	priv->vector_state = vector_state;

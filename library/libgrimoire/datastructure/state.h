@@ -27,6 +27,8 @@ struct state {
 
 	int (*is_final)(state_t * this);
 
+	state_t * (*clone)(state_t * this);
+
 	/* destroy */
 	void (*destroy)(state_t * this);
 	
