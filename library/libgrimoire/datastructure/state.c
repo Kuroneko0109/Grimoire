@@ -28,9 +28,6 @@ int state_transition(state_t * this, int input)
 	int dimension_trans;
 	int ret;
 
-	printf("%s(%d) Now input : %d\n", __func__, __LINE__, input);
-	printf("%s(%d) Now state : %d\n", __func__, __LINE__, priv->current_state);
-
 	dimension_trans =
 		priv->current_state * priv->vector_input + // Two-Dimension
 		input; // One-Dimension
@@ -38,8 +35,6 @@ int state_transition(state_t * this, int input)
 	ret = priv->transition_vector[dimension_trans];
 	if(0 <= ret)
 		priv->current_state = ret;
-
-	printf("%s(%d) Now state : %d\n", __func__, __LINE__, priv->current_state);
 
 	return ret;
 }
@@ -105,7 +100,6 @@ int state_is_final(state_t * this)
 	current_dimension_entry = priv->vector_input * priv->current_state;
 	for(i=0;i<priv->vector_input;i++)
 	{
-		printf("%s(%d) %d %d\n", __func__, __LINE__, priv->vector_input, priv->transition_vector[current_dimension_entry + i]);
 		if(0 <= priv->transition_vector[current_dimension_entry+i])
 		{
 			ret = -1;
