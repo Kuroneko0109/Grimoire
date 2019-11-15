@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 typedef struct priv_file priv_file_t;
 
@@ -99,6 +101,17 @@ ssize_t file_write(file_t * this, void * src, size_t size)
 	return -1;
 }
 
+ssize_t file_size(file_t * this)
+{
+	priv_file_t * priv = (priv_file_t *)this;
+	struct stat fstat;
+
+	if(0 > stat(priv->directory, &fstat))
+		return -1;
+
+	return fstat.st_size;
+}
+
 file_t * create_file(const char * filename)
 {
 	priv_file_t * private;
@@ -120,6 +133,7 @@ file_t * create_file(const char * filename)
 	public->read = file_read;
 	public->write = file_write;
 	public->fsync = file_fsync;
+	public->size = file_size;
 	public->destroy = file_destroy;
 
 	return public;

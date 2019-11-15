@@ -11,6 +11,7 @@ struct file {
 	int (*open)(file_t * this);
 	ssize_t (*read)(file_t * this, void * dst, size_t size);
 	ssize_t (*write)(file_t * this, void * src, size_t size);
+	ssize_t (*size)(file_t * this);
 	void (*fsync)(file_t * this);
 	void (*close)(file_t * this);
 	void (*remove)(file_t * this);
