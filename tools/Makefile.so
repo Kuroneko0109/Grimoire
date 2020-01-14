@@ -10,10 +10,10 @@ LDFLAGS = -lc -lssl -lcrypt
 all :
 	$(AR) -x $(OUTPUT_GLOBAL)/grimoire
 	$(CC) $(CFLAGS) *.o $(LDFLAGS)
-	@echo "install shared library into /usr/lib"
-	@sudo rm -f /usr/lib/$(SHARED_LIB)
-	@sudo cp $(SHARED_LIB) /usr/lib
-	@sudo rm -f /usr/lib/$(SHARED_LIBNAME_GLOBAL)
-	@sudo ln -s /usr/lib/$(SHARED_LIB) /usr/lib/$(SHARED_LIBNAME_GLOBAL)
+	@echo "install shared library into $(SO_INSTALL_DIR)"
+	@sudo rm -f $(SO_INSTALL_DIR)/$(SHARED_LIB)
+	@sudo cp $(SHARED_LIB) $(SO_INSTALL_DIR)
+	@sudo rm -f $(SO_INSTALL_DIR)/$(SHARED_LIBNAME_GLOBAL)
+	@sudo ln -s $(SO_INSTALL_DIR)/$(SHARED_LIB) $(SO_INSTALL_DIR)/$(SHARED_LIBNAME_GLOBAL)
 
 .PHONY : all

@@ -2,10 +2,12 @@ TOP_DIR = $(shell pwd)
 LIBRARY = $(TOP_DIR)/library
 OUTPUT_GLOBAL = $(shell pwd)/output
 LIBRARY_ARCHIVE ?= $(OUTPUT_GLOBAL)/grimoire
+SO_INSTALL_DIR ?= /usr/lib
 export TOP_DIR
 export LIBRARY
 export LIBRARY_ARCHIVE
 export OUTPUT_GLOBAL
+export SO_INSTALL_DIR
 
 all : library program
 	@$(MAKE) -s -C $(OUTPUT_GLOBAL)
