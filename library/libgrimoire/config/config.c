@@ -135,6 +135,13 @@ config_t * create_config(char * directory, int buffer_len)
 	private->buffer_len = buffer_len;
 	private->parser = config_parser;
 	private->file = create_file(directory);
+	if(private->file->exist(private->file))
+	{
+		private->file->destroy(private->file);
+		printf("Cannot find config file(%s)\n", directory);
+		return NULL;
+	}
+
 	private->list = create_list(NULL, config_dump_element);
 	memset(private->buffer, 0, private->buffer_len);
 
