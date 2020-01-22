@@ -31,11 +31,16 @@ struct priv_state2 {
 int state2_transition(state2_t * this, int input)
 {
 	priv_state2_t * priv = (priv_state2_t *)this;
-	int ret;
+	int ret = -1;
+	int next_state;
 
-	ret = this->transition_check(this, input);
-	if(0 <= ret)
-		priv->current_state = ret;
+	next_state = this->transition_check(this, input);
+	if(0 <= next_state)
+	{
+		ret = priv->transition_output[priv->current_state * priv->vector_input + input];
+
+		priv->current_state = next_state;
+	}
 
 	return ret;
 }
@@ -160,6 +165,7 @@ struct state2 * create_state2(int vector_state, int vector_input)
 	for(i=0;i<vector_size;i++)
 	{
 		priv->transition_vector[i] = -1;
+		priv->transition_output[i] = -1;
 	}
 
 	public = &priv->public;
