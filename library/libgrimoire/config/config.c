@@ -142,7 +142,7 @@ config_t * create_config(char * directory, int buffer_len)
 		return NULL;
 	}
 
-	private->list = create_list(NULL, config_dump_element);
+	private->list = create_list(LOCK_MUTEX, NULL, config_dump_element);
 	memset(private->buffer, 0, private->buffer_len);
 
 	public->get_value = config_get_value;

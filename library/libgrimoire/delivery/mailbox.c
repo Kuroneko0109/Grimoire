@@ -51,7 +51,7 @@ mailbox_t * create_mailbox(char * boxname)
 	public->get_name = mailbox_get_name;
 	public->input = mailbox_input;
 
-	private->mail_list = create_list(NULL, NULL);
+	private->mail_list = create_list(LOCK_MUTEX, NULL, NULL);
 
 	strcpy(private->boxname, boxname);
 

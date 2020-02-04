@@ -1,6 +1,7 @@
 #ifndef _LIST_
 #define _LIST_
 
+#include <libgrimoire/system/lock.h>
 #include <libgrimoire/datastructure/node.h>
 #include <libgrimoire/datastructure/iterator.h>
 
@@ -43,6 +44,7 @@ struct list {
 };
 
 list_t * create_list(
+		int lock_mode,
 		void * (*method_destroyer)(void *),
 		void * (*method_dump)(void *));
 

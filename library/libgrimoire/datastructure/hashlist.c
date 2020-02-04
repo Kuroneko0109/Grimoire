@@ -84,7 +84,7 @@ list_t * hashlist_merge(hashlist_t * this)
 	unsigned int i;
 	void * data;
 
-	ret = create_list(priv->method_destroyer, priv->method_dump);
+	ret = create_list(LOCK_MUTEX, priv->method_destroyer, priv->method_dump);
 	for(i=0;i<priv->hash_size;i++)
 	{
 		chain = priv->chain[i];
@@ -137,7 +137,7 @@ hashlist_t * create_hashlist(
 	public->merge = hashlist_merge;
 
 	for(i=0;i<hash_size;i++)
-		private->chain[i] = create_list(method_destroyer, method_dump);
+		private->chain[i] = create_list(LOCK_MUTEX, method_destroyer, method_dump);
 
 	return public;
 }

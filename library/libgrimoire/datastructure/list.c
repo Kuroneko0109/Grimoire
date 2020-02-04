@@ -365,6 +365,7 @@ int list_likely(list_t * this, list_t * list_obj)
 }
 
 list_t * create_list(
+		int lock_mode,
 		void * (*method_destroyer)(void *),
 		void * (*method_dump)(void *))
 {
@@ -381,7 +382,7 @@ list_t * create_list(
 	private->method_copy = NULL;
 	private->method_sort = NULL;
 	private->method_dump = method_dump;
-	private->lock = create_lock(LOCK_SPINLOCK);
+	private->lock = create_lock(lock_mode);
 	private->cache = NULL;
 	private->using_iterator_cache = 0;
 

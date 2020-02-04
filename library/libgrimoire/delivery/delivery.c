@@ -70,7 +70,7 @@ void __attribute__((constructor)) init_delivery(void)
 	delivery_global->public.register_mailbox = delivery_register_mailbox;
 	delivery_global->public.destroy = delivery_destroy;
 
-	delivery_global->boxlist = create_list(NULL, NULL);
+	delivery_global->boxlist = create_list(LOCK_MUTEX, NULL, NULL);
 }
 
 delivery_t * get_delivery_global(void)

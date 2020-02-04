@@ -126,7 +126,7 @@ command_word_t * create_command_word(const char * wordstr, int (*func)(void *, c
 	if(description)
 		strncpy(private->description, description, sizeof(private->description));
 
-	private->next_word_list = create_list(NULL, NULL);
+	private->next_word_list = create_list(LOCK_MUTEX, NULL, NULL);
 
 	public->exec = command_word_exec;
 	public->set_func = command_word_set_func;

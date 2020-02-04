@@ -84,7 +84,7 @@ vector_t * create_vector(void)
 	public->get_dimension_count = vector_get_dimension_count;
 	public->get_dimension_size = vector_get_dimension_size;
 
-	private->dimensions = create_list(NULL, NULL);
+	private->dimensions = create_list(LOCK_MUTEX, NULL, NULL);
 
 	private->dimension_count = 0;
 	private->dimension_root = NULL;

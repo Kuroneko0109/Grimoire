@@ -81,7 +81,7 @@ void __attribute__((constructor)) init_event_ctrl_global(void)
 	private = event_ctrl_global;
 	public = &event_ctrl_global->public;
 
-	private->event_list = create_list(NULL, NULL);
+	private->event_list = create_list(LOCK_MUTEX, NULL, NULL);
 
 	public->register_event = event_ctrl_register_event;
 	public->event_ctrl_poll = event_ctrl_poll;
