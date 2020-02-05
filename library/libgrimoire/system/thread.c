@@ -182,3 +182,9 @@ thread_t * create_thread(list_t * task_list)
 
 	return public;
 }
+
+void * thread_default_idle(void * param)
+{
+	usleep(1);
+	return param;
+}

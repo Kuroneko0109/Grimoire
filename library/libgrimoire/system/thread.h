@@ -20,6 +20,8 @@ struct thread {
 	void (*destroy)(thread_t * this);
 };
 
+void * thread_default_idle(void *);
+
 thread_t * create_thread(list_t * task_list);
 
 #endif

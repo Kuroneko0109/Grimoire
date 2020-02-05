@@ -22,6 +22,9 @@ void binary_dump(char * title, uint8_t * buffer, int size);
 
 typedef struct logger logger_t;
 struct logger {
+#define LOGMODE_ASYNC	(0)
+#define LOGMODE_SYNC	(1)
+
 #define LOG_ERROR	(0)
 #define LOG_CRITICAL	(1)
 #define LOG_WARNING	(2)
@@ -31,7 +34,9 @@ struct logger {
 	int (*log)(logger_t *, int, const char *, ...);
 
 	void (*set_level)(logger_t *, int);
+	void (*set_mode)(logger_t *, int);
 	void (*set_method)(logger_t *, const char *);
+	void (*assign_logfile)(logger_t *, const char *);
 };
 
 logger_t * create_logger(void);
