@@ -115,7 +115,9 @@ int logger_log(logger_t * this, int level, const char * fmt, ...)
 	{
 		tmp = malloc(strlen(buffer2));
 		strcpy(tmp, buffer2);
+		priv->async_queue->lock(priv->async_queue);
 		priv->async_queue->enqueue_data(priv->async_queue, tmp);
+		priv->async_queue->unlock(priv->async_queue);
 	}
 	else
 		ret = priv->internal_method(this, buffer2);
@@ -159,9 +161,23 @@ void logger_assign_logfile(logger_t * this, const char * path)
 	priv->exparam = create_file(path);
 }
 
-void logger_set_level(logger_t * this, int level)
+void logger_set_level(logger_t * this, const char * strlevel)
 {
 	priv_logger_t * priv = (priv_logger_t *)this;
+	int level;
+
+	if(0 == strcmp("error", strlevel))
+		level = LOG_ERROR;
+	else if(0 == strcmp("critical", strlevel))
+		level = LOG_CRITICAL;
+	else if(0 == strcmp("warning", strlevel))
+		level = LOG_WARNING;
+	else if(0 == strcmp("notice", strlevel))
+		level = LOG_NOTICE;
+	else if(0 == strcmp("info", strlevel))
+		level = LOG_INFO;
+	else if(0 == strcmp("debug", strlevel))
+		level = LOG_DEBUG;
 
 	priv->level = level;
 }
@@ -178,9 +194,13 @@ void logger_set_method(logger_t * this, const char * method_name)
 		priv->internal_method = logger_method_printf;
 }
 
-void logger_set_mode(logger_t * this, int mode)
+void logger_set_mode(logger_t * this, const char * modename)
 {
 	priv_logger_t * priv = (priv_logger_t *)this;
+
+	int mode = LOGMODE_SYNC;
+	if(0 == strcmp(modename, "async"))
+		mode = LOGMODE_ASYNC;
 
 	if(LOGMODE_ASYNC == mode)
 	{
@@ -215,9 +235,9 @@ logger_t * create_logger(void)
 	public->set_mode = logger_set_mode;
 	public->assign_logfile = logger_assign_logfile;
 
-	public->set_level(public, LOG_DEBUG);
+	public->set_mode(public, "sync");
+	public->set_level(public, "debug");
 	public->set_method(public, "printf");
-	public->set_mode(public, LOGMODE_ASYNC);
 
 	return public;
 }

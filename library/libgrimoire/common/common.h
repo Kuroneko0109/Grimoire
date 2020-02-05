@@ -33,8 +33,8 @@ struct logger {
 #define LOG_DEBUG	(5)
 	int (*log)(logger_t *, int, const char *, ...);
 
-	void (*set_level)(logger_t *, int);
-	void (*set_mode)(logger_t *, int);
+	void (*set_level)(logger_t *, const char *);
+	void (*set_mode)(logger_t *, const char *);
 	void (*set_method)(logger_t *, const char *);
 	void (*assign_logfile)(logger_t *, const char *);
 };
