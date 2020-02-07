@@ -99,9 +99,9 @@ int logger_log(logger_t * this, int level, const char * fmt, ...)
 		return -1;
 
 	buffer1 = malloc(8192);
+	memset(buffer1, 0, sizeof(buffer1));
 
 	buffer2 = buffer1 + 4096;
-	memset(buffer2, 0, 4096);
 
 	strcpy(buffer1, msg_head[level]);
 	strcat(buffer1, fmt);
@@ -113,8 +113,10 @@ int logger_log(logger_t * this, int level, const char * fmt, ...)
 
 	if(LOGMODE_ASYNC == priv->log_mode)
 	{
-		tmp = malloc(strlen(buffer2));
+		tmp = malloc(strlen(buffer2)+1);
+		memset(tmp, 0, strlen(buffer2)+1);
 		strcpy(tmp, buffer2);
+
 		priv->async_queue->lock(priv->async_queue);
 		priv->async_queue->enqueue_data(priv->async_queue, tmp);
 		priv->async_queue->unlock(priv->async_queue);
