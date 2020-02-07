@@ -58,6 +58,27 @@ int chrono_check_period(chrono_t * this)
 	this->time_slip(this, diff);
 
 	if(priv->time_limit < priv->time_vector)
+		ret = 1;
+
+	return ret;
+}
+
+int chrono_check_period_reset(chrono_t * this)
+{
+	priv_chrono_t * priv = (priv_chrono_t *)this;
+	int ret;
+
+	long long now;
+	long long diff;
+
+	ret = 0;
+
+	now = get_nanosec();
+	diff = now - priv->time_last;
+
+	this->time_slip(this, diff);
+
+	if(priv->time_limit < priv->time_vector)
 	{
 		this->time_lapse(this, priv->time_limit);
 		ret = 1;
@@ -96,6 +117,7 @@ chrono_t * create_chrono(void)
 	public->time_slip = chrono_time_slip;
 	public->set_period = chrono_set_period;
 	public->check_period = chrono_check_period;
+	public->check_period_reset = chrono_check_period_reset;
 
 	public->start = chrono_start;
 

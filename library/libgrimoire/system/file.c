@@ -1,5 +1,7 @@
 #include <libgrimoire/system/file.h>
 #include <libgrimoire/system/lock.h>
+#include <string.h>
+#include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,7 +19,7 @@ struct priv_file {
 	int flags;
 	int permission;
 
-	const char * directory;
+	char path[512];
 
 	lock_t * lock;
 };
@@ -26,7 +28,7 @@ void file_creat(file_t * this)
 {
 	priv_file_t * priv = (priv_file_t *)this;
 
-	creat(priv->directory, priv->permission);
+	creat(priv->path, priv->permission);
 }
 
 int file_open(file_t * this)
@@ -39,7 +41,7 @@ int file_open(file_t * this)
 	if(this->exist(this))
 		this->creat(this);
 
-	priv->fd = open(priv->directory, priv->flags);
+	priv->fd = open(priv->path, priv->flags);
 	
 	return priv->fd;
 }
@@ -59,7 +61,17 @@ int file_exist(file_t * this)
 {
 	priv_file_t * priv = (priv_file_t *)this;
 
-	return access(priv->directory, F_OK);
+	return access(priv->path, F_OK);
+}
+
+void file_set_path(file_t * this, const char * path)
+{
+	priv_file_t * priv = (priv_file_t *)this;
+
+	if(path)
+		strcpy(priv->path, path);
+	else
+		printf("%s(%d) ERROR : path is NULL\n", __func__, __LINE__);
 }
 
 void file_fsync(file_t * this)
@@ -106,21 +118,21 @@ ssize_t file_size(file_t * this)
 	priv_file_t * priv = (priv_file_t *)this;
 	struct stat fstat;
 
-	if(0 > stat(priv->directory, &fstat))
+	if(0 > stat(priv->path, &fstat))
 		return -1;
 
 	return fstat.st_size;
 }
 
-file_t * create_file(const char * filename)
+file_t * create_file(const char * path)
 {
 	priv_file_t * private;
 	file_t * public;
 
 	private = malloc(sizeof(priv_file_t));
 	public = &private->public;
+	memset(private, 0, sizeof(priv_file_t));
 
-	private->directory = filename;
 	private->fd = -1;
 	private->flags = O_RDWR | O_CREAT;
 	private->permission = 0644;
@@ -132,9 +144,12 @@ file_t * create_file(const char * filename)
 	public->close = file_close;
 	public->read = file_read;
 	public->write = file_write;
+	public->set_path = file_set_path;
 	public->fsync = file_fsync;
 	public->size = file_size;
 	public->destroy = file_destroy;
+
+	public->set_path(public, path);
 
 	return public;
 }

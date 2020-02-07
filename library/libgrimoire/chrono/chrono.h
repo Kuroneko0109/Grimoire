@@ -18,7 +18,9 @@ struct chrono {
 	void (*time_lapse)(chrono_t * this, long long nanosec);
 	void (*time_slip)(chrono_t * this, long long nanosec);
 	void (*set_period)(chrono_t * this, long long nanosec);
+
 	int (*check_period)(chrono_t * this);
+	int (*check_period_reset)(chrono_t * this);
 
 	void (*start)(chrono_t * this);
 
