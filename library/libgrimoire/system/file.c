@@ -96,21 +96,31 @@ void file_destroy(file_t * this)
 ssize_t file_read(file_t * this, void * dst, size_t size)
 {
 	priv_file_t * priv = (priv_file_t *)this;
+	ssize_t ret = -1;
 	
 	if(-1 != priv->fd)
-		return read(priv->fd, dst, size);
+	{
+		priv->lock->lock(priv->lock);
+		ret = read(priv->fd, dst, size);
+		priv->lock->unlock(priv->lock);
+	}
 
-	return -1;
+	return ret;
 }
 
 ssize_t file_write(file_t * this, void * src, size_t size)
 {
 	priv_file_t * priv = (priv_file_t *)this;
+	ssize_t ret = -1;
 
 	if(-1 != priv->fd)
-		return write(priv->fd, src, size);
+	{
+		priv->lock->lock(priv->lock);
+		ret = write(priv->fd, src, size);
+		priv->lock->unlock(priv->lock);
+	}
 
-	return -1;
+	return ret;
 }
 
 ssize_t file_size(file_t * this)
@@ -122,6 +132,13 @@ ssize_t file_size(file_t * this)
 		return -1;
 
 	return fstat.st_size;
+}
+
+int file_seek(file_t * this, off_t off, int whence)
+{
+	priv_file_t * priv = (priv_file_t *)this;
+
+	return lseek(priv->fd, off, whence);
 }
 
 file_t * create_file(const char * path)
@@ -144,6 +161,7 @@ file_t * create_file(const char * path)
 	public->close = file_close;
 	public->read = file_read;
 	public->write = file_write;
+	public->seek = file_seek;
 	public->set_path = file_set_path;
 	public->fsync = file_fsync;
 	public->size = file_size;

@@ -2,6 +2,7 @@
 #define _FILE_
 
 #include <sys/types.h>
+#include <fcntl.h>
 
 typedef struct file file_t;
 
@@ -9,6 +10,7 @@ struct file {
 	int (*exist)(file_t * this);
 	void (*creat)(file_t * this);
 	int (*open)(file_t * this);
+	int (*seek)(file_t * this, off_t offset, int whence);
 	ssize_t (*read)(file_t * this, void * dst, size_t size);
 	ssize_t (*write)(file_t * this, void * src, size_t size);
 	ssize_t (*size)(file_t * this);

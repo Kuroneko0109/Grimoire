@@ -81,6 +81,7 @@ int logger_method_file(logger_t * this, const char * data)
 		return -1;
 
 	file->open(file);	// if file opened, isn't makes problem
+	file->seek(file, 0, SEEK_END);
 	return file->write(file, (void *)data, strlen(data));
 }
 
