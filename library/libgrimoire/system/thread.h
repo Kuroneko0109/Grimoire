@@ -16,7 +16,8 @@ struct thread {
 	int (*run)(thread_t * this);
 	void (*stop)(thread_t * this);
 
-	void (*dump)(thread_t * this);
+	void (*set_dump)(thread_t * this);
+	void * (*dump)(thread_t * this);
 	void (*destroy)(thread_t * this);
 };
 

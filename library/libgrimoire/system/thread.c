@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include <libgrimoire/chrono/chrono.h>
 #include <libgrimoire/system/task.h>
 #include <libgrimoire/system/thread.h>
 #include <libgrimoire/datastructure/list.h>
@@ -110,7 +111,7 @@ void thread_stop(thread_t * this)
 	pthread_detach(priv->pthread);
 }
 
-void thread_dump(thread_t * this)
+void * thread_dump(thread_t * this)
 {
 	priv_thread_t * priv = (priv_thread_t *)this;
 	list_t * task_list = priv->task_list;
@@ -124,14 +125,14 @@ void thread_dump(thread_t * this)
 				sizeof(cpu_set_t),
 				&priv->cpuset));
 #endif
-	task_list->lock(task_list);
+//	task_list->lock(task_list);
 	iterator = task_list->get_iterator(task_list);
 
 	while((task = iterator->next(iterator)))
 		task->dump(task);
 
 	iterator->destroy(iterator);
-	task_list->unlock(task_list);
+//	task_list->unlock(task_list);
 }
 
 void thread_execute_once(thread_t * this)
@@ -152,6 +153,16 @@ void thread_core_bind(thread_t * this, int core_mask)
 	CPU_SET(core_mask, &priv->cpuset);
 }
 
+void thread_set_dump(thread_t * this)
+{
+	priv_thread_t * priv = (priv_thread_t *)this;
+	task_t * task;
+
+	task = create_task("Thread dump", thread_dump, this, NULL);
+	task->set_period(task, SEC_TO_NANOSEC);
+	this->task_register(this, task);
+}
+
 thread_t * create_thread(list_t * task_list)
 {
 	priv_thread_t * private;
@@ -167,24 +178,23 @@ thread_t * create_thread(list_t * task_list)
 	public->dump = thread_dump;
 	public->destroy = thread_destroy;
 	public->run = thread_run;
+	public->set_dump = thread_set_dump;
 	public->core_bind = thread_core_bind;
 
 	if(NULL == task_list)
-		private->task_list = create_list(LOCK_MUTEX, NULL, NULL);
+		private->task_list = create_list(LOCK_SPINLOCK, NULL, NULL);
 	else
 		private->task_list = task_list;
 
 	private->thread_driver = thread_invoke;
 
-	public->core_bind(public, 0);
-
-	public->dump(public);
+//	public->core_bind(public, 0);
 
 	return public;
 }
 
 void * thread_default_idle(void * param)
 {
-	usleep(1);
+	usleep(1000);
 	return param;
 }
