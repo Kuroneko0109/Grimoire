@@ -44,7 +44,7 @@ int task_timer_check(task_t * this)
 {
 	priv_task_t * priv = (priv_task_t *)this;
 
-	return priv->timer->check_period(priv->timer);
+	return priv->timer->check_period_reset(priv->timer);
 }
 
 void * task_exec(void * param)

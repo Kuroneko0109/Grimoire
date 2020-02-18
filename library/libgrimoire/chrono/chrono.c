@@ -98,6 +98,7 @@ void chrono_start(chrono_t * this)
 	priv_chrono_t * priv = (priv_chrono_t *)this;
 
 	priv->time_last = get_nanosec();
+	priv->time_vector = 0;
 }
 
 void chrono_destroy(chrono_t * this)
