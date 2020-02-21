@@ -2,12 +2,13 @@
 #define _CHRONO_
 
 #include <time.h>
+#include <stdint.h>
 
-#define SEC_TO_NANOSEC	(1000000000LL)
+#define SEC_TO_NANOSEC	(1000000000ULL)
 
-static inline long long get_nanosec(void)
+static inline uint64_t get_nanosec(void)
 {
-	struct timespec tv;
+	struct timespec tv = {0, };
 	clock_gettime(CLOCK_MONOTONIC, &tv);
 	return ((tv.tv_sec * SEC_TO_NANOSEC) + tv.tv_nsec);
 }
@@ -15,9 +16,9 @@ static inline long long get_nanosec(void)
 typedef struct chrono chrono_t;
 
 struct chrono {
-	void (*time_lapse)(chrono_t * this, long long nanosec);
-	void (*time_slip)(chrono_t * this, long long nanosec);
-	void (*set_period)(chrono_t * this, long long nanosec);
+	void (*time_lapse)(chrono_t * this, uint64_t nanosec);
+	void (*time_slip)(chrono_t * this, uint64_t nanosec);
+	void (*set_period)(chrono_t * this, uint64_t nanosec);
 
 	int (*check_period)(chrono_t * this);
 	int (*check_period_reset)(chrono_t * this);

@@ -2,33 +2,34 @@
 #include <stdlib.h>
 #include <time.h>
 #include <libgrimoire/chrono/chrono.h>
+#include <stdint.h>
 
 typedef struct priv_chrono priv_chrono_t;
 
 struct priv_chrono {
 	chrono_t public;
 
-	long long time_vector;
-	long long time_limit;
+	uint64_t time_vector;
+	uint64_t time_limit;
 
-	long long time_last;
+	uint64_t time_last;
 };
 
-void chrono_time_lapse(chrono_t * this, long long nanosec)
+void chrono_time_lapse(chrono_t * this, uint64_t nanosec)
 {
 	priv_chrono_t * priv = (priv_chrono_t *)this;
 
 	priv->time_vector -= nanosec;
 }
 
-void chrono_time_slip(chrono_t * this, long long nanosec)
+void chrono_time_slip(chrono_t * this, uint64_t nanosec)
 {
 	priv_chrono_t * priv = (priv_chrono_t *)this;
 
 	priv->time_vector += nanosec;
 }
 
-void chrono_set_period(chrono_t * this, long long nanosec)
+void chrono_set_period(chrono_t * this, uint64_t nanosec)
 {
 	priv_chrono_t * priv = (priv_chrono_t *)this;
 
@@ -39,7 +40,7 @@ void chrono_dump(chrono_t * this)
 {
 	priv_chrono_t * priv = (priv_chrono_t *)this;
 
-	printf("vector : %lld, limit : %lld, last : %lld\n", priv->time_vector, priv->time_limit, priv->time_last);
+	printf("vector : %lu, limit : %lu, last : %lu\n", priv->time_vector, priv->time_limit, priv->time_last);
 }
 
 int chrono_check_period(chrono_t * this)
@@ -59,6 +60,8 @@ int chrono_check_period(chrono_t * this)
 
 	if(priv->time_limit < priv->time_vector)
 		ret = 1;
+
+	priv->time_last = get_nanosec();
 
 	return ret;
 }
@@ -84,11 +87,7 @@ int chrono_check_period_reset(chrono_t * this)
 		ret = 1;
 	}
 
-/*
-	if(ret)
-		this->dump(this);
-*/
-	this->start(this);
+	priv->time_last = get_nanosec();
 
 	return ret;
 }
