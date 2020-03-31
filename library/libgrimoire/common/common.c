@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <time.h>
 
 void trimnl(char * str)
 {
@@ -96,15 +97,24 @@ int logger_log(logger_t * this, int level, const char * fmt, ...)
 
 	char * tmp;
 
+	time_t t;
+	struct tm lt;
+
 	if(level > priv->level)
 		return -1;
 
 	buffer1 = malloc(8192);
-	memset(buffer1, 0, sizeof(buffer1));
+	memset(buffer1, 0, 8192);
 
 	buffer2 = buffer1 + 4096;
 
-	strcpy(buffer1, msg_head[level]);
+	t = time(NULL);
+	localtime_r(&t, &lt);
+
+	sprintf(buffer1, "%04d-%02d-%02d %02d:%02d:%02d] ",
+			lt.tm_year + 1900, lt.tm_mon + 1, lt.tm_mday,
+			lt.tm_hour, lt.tm_min, lt.tm_sec);
+	strcat(buffer1, msg_head[level]);
 	strcat(buffer1, fmt);
 
 	va_start(list, fmt);
