@@ -1,4 +1,5 @@
 #include <libgrimoire/security/security_client.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/security/cpkt.h>
 #include <libgrimoire/security/dh.h>
 #include <libgrimoire/datastructure/list.h>
@@ -140,7 +141,7 @@ void security_client_request_service(security_client_t * this)
 	{
 		char * name;
 		int uid;
-		info = malloc(sizeof(service_info_t));
+		info = galloc(sizeof(service_info_t));
 		json_unpack(svc, "{s:s, s:i}", "name", &name, "uid", &uid);
 		strcpy(info->name, name);
 		info->uid = uid;
@@ -163,7 +164,7 @@ security_client_t * create_security_client(int mode, peer_t * peer, sa_t * sa)
 	priv_security_client_t * private;
 	security_client_t * public;
 
-	private = malloc(sizeof(priv_security_client_t));
+	private = galloc(sizeof(priv_security_client_t));
 	public = &private->public;
 
 	private->mode = mode;

@@ -1,4 +1,5 @@
 #include <libgrimoire/security/sa.h>
+#include <libgrimoire/system/memory.h>
 #include <stdlib.h>
 
 #include <stdint.h>
@@ -119,7 +120,7 @@ sa_t * create_sa(void)
 	priv_sa_t * private;
 	sa_t * public;
 
-	private = malloc(sizeof(priv_sa_t));
+	private = galloc(sizeof(priv_sa_t));
 	public = &private->public;
 
 	private->ectx = EVP_CIPHER_CTX_new();

@@ -1,4 +1,5 @@
 #include <libgrimoire/datastructure/iterator.h>
+#include <libgrimoire/system/memory.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -84,7 +85,7 @@ iterator_t * create_iterator(int count)
 	priv_iterator_t * private;
 	iterator_t * public;
 
-	private = malloc(sizeof(priv_iterator_t));
+	private = galloc(sizeof(priv_iterator_t));
 	public = &private->public;
 	public->destroy = iterator_destroy;
 	public->get_count = iterator_get_count;
@@ -95,7 +96,7 @@ iterator_t * create_iterator(int count)
 
 	private->count = count;
 	private->index = 0;
-	private->table = malloc(sizeof(void *) * count);
+	private->table = galloc(sizeof(void *) * count);
 
 	return public;
 }

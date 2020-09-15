@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/security/dh.h>
 
 /*
@@ -193,7 +194,7 @@ dh_t * create_dh(int group)
 	priv_dh_t * private;
 	dh_t * public;
 
-	private = malloc(sizeof(priv_dh_t));
+	private = galloc(sizeof(priv_dh_t));
 	public = &private->public;
 
 	private->group_info = dh_param;

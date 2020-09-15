@@ -1,5 +1,6 @@
 #include <libgrimoire/datastructure/list.h>
 #include <libgrimoire/common/command_word.h>
+#include <libgrimoire/system/memory.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,7 +115,7 @@ command_word_t * create_command_word(const char * wordstr, int (*func)(void *, c
 	priv_command_word_t * private;
 	command_word_t * public;
 
-	private = malloc(sizeof(priv_command_word_t));
+	private = galloc(sizeof(priv_command_word_t));
 	public = &private->public;
 
 	memset(private->word, 0, sizeof(private->word));

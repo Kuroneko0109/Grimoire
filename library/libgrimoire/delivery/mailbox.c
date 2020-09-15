@@ -2,6 +2,7 @@
 #include <string.h>
 #include <libgrimoire/delivery/mailbox.h>
 #include <libgrimoire/datastructure/list.h>
+#include <libgrimoire/system/memory.h>
 
 typedef struct priv_mailbox priv_mailbox_t;
 
@@ -44,7 +45,7 @@ mailbox_t * create_mailbox(char * boxname)
 	priv_mailbox_t * private;
 	mailbox_t * public;
 
-	private = malloc(sizeof(priv_mailbox_t));
+	private = galloc(sizeof(priv_mailbox_t));
 	public = &private->public;
 
 	public->destroy = mailbox_destroy;
@@ -62,7 +63,7 @@ mail_t * create_mail(int datasize)
 {
 	mail_t * mail;
 
-	mail = malloc(sizeof(mail_t) + datasize);
+	mail = galloc(sizeof(mail_t) + datasize);
 	mail->datasize = datasize;
 
 	return mail;

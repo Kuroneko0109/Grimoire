@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <libgrimoire/chrono/chrono.h>
+#include <libgrimoire/system/memory.h>
 #include <stdint.h>
 
 typedef struct priv_chrono priv_chrono_t;
@@ -110,7 +111,7 @@ chrono_t * create_chrono(void)
 	priv_chrono_t * private;
 	chrono_t * public;
 
-	private = malloc(sizeof(priv_chrono_t));
+	private = galloc(sizeof(priv_chrono_t));
 	public = &private->public;
 
 	public->time_lapse = chrono_time_lapse;

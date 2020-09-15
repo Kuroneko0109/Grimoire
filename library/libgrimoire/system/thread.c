@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/chrono/chrono.h>
 #include <libgrimoire/system/task.h>
 #include <libgrimoire/system/thread.h>
@@ -168,7 +169,7 @@ thread_t * create_thread(list_t * task_list)
 	priv_thread_t * private;
 	thread_t * public;
 
-	private = malloc(sizeof(priv_thread_t));
+	private = galloc(sizeof(priv_thread_t));
 	public = &private->public;
 
 	public->task_list_set = thread_task_list_set;

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/chrono/chrono.h>
 #include <libgrimoire/system/task.h>
 
@@ -79,7 +80,7 @@ task_t * create_task(char * task_name, void * (*func)(void *), void * param, voi
 	priv_task_t * private;
 	task_t * public;
 
-	private = malloc(sizeof(priv_task_t));
+	private = galloc(sizeof(priv_task_t));
 	public = &private->public;
 
 	strcpy(private->task_name, task_name);

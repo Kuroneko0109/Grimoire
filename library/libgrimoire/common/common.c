@@ -1,6 +1,7 @@
 #include <libgrimoire/system/thread.h>
 #include <libgrimoire/system/file.h>
 #include <libgrimoire/common/common.h>
+#include <libgrimoire/system/memory.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -103,7 +104,7 @@ int logger_log(logger_t * this, int level, const char * fmt, ...)
 	if(level > priv->level)
 		return -1;
 
-	buffer1 = malloc(8192);
+	buffer1 = galloc(8192);
 	memset(buffer1, 0, 8192);
 
 	buffer2 = buffer1 + 4096;
@@ -124,7 +125,7 @@ int logger_log(logger_t * this, int level, const char * fmt, ...)
 
 	if(LOGMODE_ASYNC == priv->log_mode)
 	{
-		tmp = malloc(strlen(buffer2)+1);
+		tmp = galloc(strlen(buffer2)+1);
 		memset(tmp, 0, strlen(buffer2)+1);
 		strcpy(tmp, buffer2);
 
@@ -238,7 +239,7 @@ logger_t * create_logger(void)
 	logger_t * public;
 	priv_logger_t * private;
 
-	private = malloc(sizeof(priv_logger_t));
+	private = galloc(sizeof(priv_logger_t));
 	public = &private->public;
 
 	public->log = logger_log;

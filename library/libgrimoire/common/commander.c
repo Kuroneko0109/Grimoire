@@ -1,5 +1,6 @@
 #include <libgrimoire/common/commander.h>
 #include <libgrimoire/common/command_word.h>
+#include <libgrimoire/system/memory.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,7 +110,7 @@ commander_t * create_commander(void)
 	priv_commander_t * private;
 	commander_t * public;
 
-	private = malloc(sizeof(priv_commander_t));
+	private = galloc(sizeof(priv_commander_t));
 	public = &private->public;
 
 	private->root_word = create_command_word("/", NULL, NULL);

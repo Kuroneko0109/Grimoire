@@ -1,4 +1,5 @@
 #include <libgrimoire/datastructure/hashlist.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/nlp/knowledge.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -77,7 +78,7 @@ unsigned int knowledge_string_hasher(void * data)
 void * knowledge_copy(void * data)
 {
 	char * ret;
-	ret = malloc(strlen(data) + 1);
+	ret = galloc(strlen(data) + 1);
 	strcpy(ret, data);
 	return (void *)ret;
 }
@@ -87,7 +88,7 @@ knowledge_t * create_knowledge(unsigned int hash_size)
 	priv_knowledge_t * private;
 	knowledge_t * public;
 
-	private = malloc(sizeof(priv_knowledge_t));
+	private = galloc(sizeof(priv_knowledge_t));
 	public = &private->public;
 	private->dictionary = create_hashlist(
 			knowledge_string_hasher,

@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <openssl/ssl.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/security/tls_peer.h>
 
 typedef struct priv_tls_peer priv_tls_peer_t;
@@ -88,7 +89,7 @@ tls_peer_t * create_tls_peer(SSL * ssl)
 	priv_tls_peer_t * private;
 	tls_peer_t * public;
 
-	private = malloc(sizeof(priv_tls_peer_t));
+	private = galloc(sizeof(priv_tls_peer_t));
 	public = &private->public;
 
 	public->read = tls_peer_read;

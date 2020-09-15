@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/hashlist.h>
 #include <libgrimoire/datastructure/list.h>
 
@@ -120,7 +121,7 @@ hashlist_t * create_hashlist(
 	hashlist_t * public;
 	unsigned int i;
 
-	private = malloc(sizeof(priv_hashlist_t) + sizeof(list_t *) * hash_size);
+	private = galloc(sizeof(priv_hashlist_t) + sizeof(list_t *) * hash_size);
 	public = &private->public;
 
 	private->hasher = hashlist_hasher_wrap;

@@ -1,4 +1,5 @@
 #include <libgrimoire/security/tls_server.h>
+#include <libgrimoire/system/memory.h>
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -94,7 +95,7 @@ tls_server_t * create_tls_server(config_t * config)
 
 	char * value;
 
-	private = malloc(sizeof(priv_tls_server_t));
+	private = galloc(sizeof(priv_tls_server_t));
 	public = &private->public;
 
 	private->fd = -1;

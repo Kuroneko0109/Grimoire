@@ -1,4 +1,5 @@
 #include <libgrimoire/datastructure/list.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/system/event.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +25,7 @@ int event_id_compare(void * _s, void * _d)
 
 event_t * create_event(char * id, int (*distinct)(void *), void * (*callback)(void *), void * param)
 {
-	event_t * event = malloc(sizeof(event_t));
+	event_t * event = galloc(sizeof(event_t));
 	event->id = id;
 	event->distinct = distinct;
 	event->callback = callback;
@@ -74,7 +75,7 @@ priv_event_ctrl_t * event_ctrl_global;
 
 void __attribute__((constructor)) init_event_ctrl_global(void)
 {
-	event_ctrl_global = malloc(sizeof(priv_event_ctrl_t));
+	event_ctrl_global = galloc(sizeof(priv_event_ctrl_t));
 	priv_event_ctrl_t * private;
 	event_ctrl_t * public;
 

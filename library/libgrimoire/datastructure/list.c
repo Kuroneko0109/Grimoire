@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/common/common.h>
 #include <libgrimoire/datastructure/list.h>
 #include <libgrimoire/datastructure/iterator.h>
@@ -372,7 +373,7 @@ list_t * create_list(
 	priv_list_t * private;
 	list_t * public;
 
-	private = malloc(sizeof(priv_list_t));
+	private = galloc(sizeof(priv_list_t));
 	public = &private->public;
 
 	private->head = NULL;

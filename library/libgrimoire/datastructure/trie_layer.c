@@ -1,4 +1,5 @@
 #include <libgrimoire/datastructure/trie_layer.h>
+#include <libgrimoire/system/memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
@@ -71,7 +72,7 @@ trie_layer_t * create_trie_layer(trie_layer_t * parent, int radix)
 	trie_layer_t * public;
 	int i;
 
-	private = malloc(offsetof(priv_trie_layer_t, next) + (sizeof(trie_layer_t *) * radix));
+	private = galloc(offsetof(priv_trie_layer_t, next) + (sizeof(trie_layer_t *) * radix));
 	public = &private->public;
 
 	private->data = NULL;

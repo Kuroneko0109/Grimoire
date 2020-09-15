@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/config/config.h>
 #include <libgrimoire/common/common.h>
 #include <libgrimoire/system/file.h>
@@ -9,7 +10,7 @@
 
 config_element_t * create_config_element(char * key, char * val)
 {
-	config_element_t * element = malloc(sizeof(config_element_t));
+	config_element_t * element = galloc(sizeof(config_element_t));
 	strcpy(element->key, key);
 	strcpy(element->val, val);
 	return element;
@@ -129,7 +130,7 @@ config_t * create_config(char * directory, int buffer_len)
 
 	list_t * list;
 
-	priv_config_t * private = malloc(sizeof(priv_config_t) + buffer_len);
+	priv_config_t * private = galloc(sizeof(priv_config_t) + buffer_len);
 	config_t * public = &private->public;
 
 	private->buffer_len = buffer_len;

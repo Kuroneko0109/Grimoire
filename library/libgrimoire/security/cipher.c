@@ -1,4 +1,5 @@
 #include <libgrimoire/security/cipher.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/list.h>
 #include <stdlib.h>
 
@@ -38,7 +39,7 @@ cipher_t * create_cipher(void)
 	priv_cipher_t * private;
 	cipher_t * public;
 
-	private = malloc(sizeof(priv_cipher_t));
+	private = galloc(sizeof(priv_cipher_t));
 	public = &private->public;
 
 	private->last_id = 0;

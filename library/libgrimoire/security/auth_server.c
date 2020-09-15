@@ -1,4 +1,5 @@
 #include <libgrimoire/common/common.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/list.h>
 #include <libgrimoire/security/auth_server.h>
 #include <libgrimoire/security/security_server.h>
@@ -157,7 +158,7 @@ auth_server_t * create_auth_server(char * account_path)
 	priv_auth_server_t * private;
 	auth_server_t * public;
 
-	private = malloc(sizeof(priv_auth_server_t));
+	private = galloc(sizeof(priv_auth_server_t));
 	public = &private->public;
 
 	private->accounts = create_config(account_path, 8192);

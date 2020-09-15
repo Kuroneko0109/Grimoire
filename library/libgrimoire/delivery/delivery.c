@@ -3,6 +3,7 @@
 #include <string.h>
 #include <libgrimoire/delivery/delivery.h>
 #include <libgrimoire/delivery/mailbox.h>
+#include <libgrimoire/system/memory.h>
 
 typedef struct priv_delivery priv_delivery_t;
 
@@ -64,7 +65,7 @@ void delivery_destroy(delivery_t * this)
 void __attribute__((constructor)) init_delivery(void)
 {
 	printf("Grimoire delivery initializing...\n");
-	delivery_global = malloc(sizeof(priv_delivery_t));
+	delivery_global = galloc(sizeof(priv_delivery_t));
 
 	delivery_global->public.send_to = delivery_send_to;
 	delivery_global->public.register_mailbox = delivery_register_mailbox;

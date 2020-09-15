@@ -1,4 +1,5 @@
 #include <libgrimoire/datastructure/trie.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/trie_layer.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -117,7 +118,7 @@ trie_t * create_trie(int radix, uint8_t * mapping_table)
 	trie_t * public;
 	int i;
 
-	private = malloc(sizeof(priv_trie_t));
+	private = galloc(sizeof(priv_trie_t));
 	public = &private->public;
 
 	private->radix = radix;
@@ -128,7 +129,7 @@ trie_t * create_trie(int radix, uint8_t * mapping_table)
 		private->mapping_table = mapping_table_default;
 	else
 	{
-		private->mapping_table = malloc(sizeof(uint8_t) * radix);
+		private->mapping_table = galloc(sizeof(uint8_t) * radix);
 		for(i=0;i<radix;i++)
 			private->mapping_table[i] = mapping_table[i];
 	}

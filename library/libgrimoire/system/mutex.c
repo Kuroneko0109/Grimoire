@@ -1,4 +1,5 @@
 #include <libgrimoire/system/mutex.h>
+#include <libgrimoire/system/memory.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -39,7 +40,7 @@ lock_t * create_mutex(void)
 	priv_mutex_t * private;
 	lock_t * public;
 
-	private = malloc(sizeof(priv_mutex_t));
+	private = galloc(sizeof(priv_mutex_t));
 	public = &private->public;
 
 	pthread_mutex_init(&private->mutex, NULL);

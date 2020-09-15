@@ -1,4 +1,5 @@
 #include <libgrimoire/math/vector.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/list.h>
 #include <libgrimoire/datastructure/iterator.h>
 #include <stdlib.h>
@@ -18,7 +19,7 @@ void vector_add_dimension(vector_t * this, int size)
 	priv_vector_t * private = (priv_vector_t *)this;
 	int * data;
 
-	data = malloc(sizeof(int));
+	data = galloc(sizeof(int));
 	*data = size;
 	private->dimension_count++;
 	private->dimensions->enqueue_data(private->dimensions, data);
@@ -41,7 +42,7 @@ void vector_create_matrix(vector_t * this)
 
 	iterator->destroy(iterator);
 
-	private->dimension_root = malloc(matrix_size * sizeof(double));
+	private->dimension_root = galloc(matrix_size * sizeof(double));
 }
 
 iterator_t * vector_get_dimension(vector_t * this)
@@ -75,7 +76,7 @@ int vector_set_data(vector_t * this, void * data)
 
 vector_t * create_vector(void)
 {
-	priv_vector_t * private = malloc(sizeof(priv_vector_t));
+	priv_vector_t * private = galloc(sizeof(priv_vector_t));
 	vector_t * public = &private->public;
 
 	public->add_dimension = vector_add_dimension;

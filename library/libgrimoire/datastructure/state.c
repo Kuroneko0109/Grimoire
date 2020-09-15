@@ -1,4 +1,5 @@
 #include <libgrimoire/datastructure/state.h>
+#include <libgrimoire/system/memory.h>
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -120,7 +121,7 @@ void state_destroy(state_t * this)
 state_t * state_clone(state_t * this)
 {
 	priv_state_t * priv = (priv_state_t *)this;
-	state_t * child = malloc(priv->self_size);
+	state_t * child = galloc(priv->self_size);
 
 	memcpy(child, priv, priv->self_size);
 
@@ -138,7 +139,7 @@ struct state * create_state(int vector_state, int vector_input)
 	vector_size = vector_state * vector_input;
 	alloc_size = sizeof(priv_state_t)
 		+ sizeof(int) * vector_size;
-	priv = malloc(alloc_size);
+	priv = galloc(alloc_size);
 	memset(priv, 0, alloc_size);
 	for(i=0;i<vector_size;i++)
 	{

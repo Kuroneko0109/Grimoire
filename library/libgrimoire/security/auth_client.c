@@ -1,4 +1,5 @@
 #include <libgrimoire/common/common.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/security/auth_client.h>
 #include <libgrimoire/security/security_client.h>
 #include <libgrimoire/security/auth.h>
@@ -152,7 +153,7 @@ auth_client_t * create_auth_client(int type)
 	priv_auth_client_t * private;
 	auth_client_t * public;
 
-	private = malloc(sizeof(priv_auth_client_t));
+	private = galloc(sizeof(priv_auth_client_t));
 	public = &private->public;
 
 	private->dh = create_dh(14);

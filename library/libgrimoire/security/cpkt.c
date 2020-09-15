@@ -1,4 +1,5 @@
 #include <libgrimoire/security/cpkt.h>
+#include <libgrimoire/system/memory.h>
 #include <stdint.h>
 
 #if 0
@@ -15,7 +16,7 @@ void cpkt_processing(cpkt_t * cpkt)
 
 cpkt_t * create_cpkt(int type, int len)
 {
-	cpkt_t * cpkt = malloc(sizeof(cpkt_t)+len);
+	cpkt_t * cpkt = galloc(sizeof(cpkt_t)+len);
 	int i;
 
 	cpkt->type = type;

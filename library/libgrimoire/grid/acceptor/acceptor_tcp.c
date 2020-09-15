@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 
 #include <libgrimoire/grid/acceptor.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/list.h>
 
 typedef struct priv_acceptor priv_acceptor_t;
@@ -98,7 +99,7 @@ acceptor_t * create_acceptor_tcp(void)
 	priv_acceptor_t * private;
 	acceptor_t * public;
 
-	private = malloc(sizeof(priv_acceptor_t));
+	private = galloc(sizeof(priv_acceptor_t));
 	public = &private->public;
 
 	public->set_addr = acceptor_set_addr_tcp;

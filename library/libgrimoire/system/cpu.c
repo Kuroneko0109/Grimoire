@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/config/config.h>
 #include <libgrimoire/system/cpu.h>
 #include <libgrimoire/system/task.h>
@@ -91,7 +92,7 @@ int init_cpu(config_t * config)
 	cpu.core_num = atoi(core_maxcount);
 	cpu.core_mapping = strtoull(core_bitmask, &core_bitmask, 16);
 
-	cpu.core_thread = malloc(sizeof(thread_t *) * cpu.core_num);
+	cpu.core_thread = galloc(sizeof(thread_t *) * cpu.core_num);
 	for(i=0;i<cpu.core_num;i++)
 	{
 		if(cpu.core_mapping & (1<<i))	// using core filtering

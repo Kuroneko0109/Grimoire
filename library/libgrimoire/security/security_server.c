@@ -1,4 +1,5 @@
 #include <libgrimoire/security/security_server.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/security/cpkt.h>
 #include <libgrimoire/security/dh.h>
 #include <error.h>
@@ -121,7 +122,7 @@ security_server_t * create_security_server(peer_t * peer, sa_t * sa, int type, c
 	priv_security_server_t * private;
 	security_server_t * public;
 
-	private = malloc(sizeof(priv_security_server_t));
+	private = galloc(sizeof(priv_security_server_t));
 	public = &private->public;
 
 	strcpy(private->name, name);

@@ -1,4 +1,5 @@
 #include <libgrimoire/neuron/layer.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/list.h>
 #include <stdlib.h>
 
@@ -12,7 +13,7 @@ struct _layer {
 
 layer_t * create_layer(void)
 {
-	priv_layer_t * private = malloc(sizeof(priv_layer_t));
+	priv_layer_t * private = galloc(sizeof(priv_layer_t));
 	layer_t * public = &private->public;
 
 	public->input = layer_input;

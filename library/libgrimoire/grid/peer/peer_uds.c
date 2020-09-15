@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 
 #include <libgrimoire/grid/peer.h>
+#include <libgrimoire/system/memory.h>
 
 typedef struct priv_peer priv_peer_t;
 
@@ -135,7 +136,7 @@ peer_t * create_peer_uds(void)
 	priv_peer_t * private;
 	peer_t * public;
 
-	private = malloc(sizeof(priv_peer_t));
+	private = galloc(sizeof(priv_peer_t));
 	public = &private->public;
 
 	private->fd = -1;

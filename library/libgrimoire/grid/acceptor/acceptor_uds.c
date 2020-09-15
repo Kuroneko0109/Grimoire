@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 
 #include <libgrimoire/grid/acceptor.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/grid/peer.h>
 #include <libgrimoire/datastructure/list.h>
 
@@ -108,7 +109,7 @@ acceptor_t * create_acceptor_uds(void)
 	priv_acceptor_t * private;
 	acceptor_t * public;
 
-	private = malloc(sizeof(priv_acceptor_t));
+	private = galloc(sizeof(priv_acceptor_t));
 	public = &private->public;
 
 	public->set_addr = acceptor_set_addr_uds;

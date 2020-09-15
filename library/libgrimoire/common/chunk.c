@@ -1,6 +1,6 @@
 #include <libgrimoire/common/chunk.h>
+#include <libgrimoire/system/memory.h>
 #include <stdlib.h>
-#include <memory.h>
 
 typedef struct priv_chunk priv_chunk_t;
 
@@ -37,11 +37,11 @@ chunk_t * create_chunk(int size, void * data)
 	priv_chunk_t * private;
 	chunk_t * public;
 
-	private = malloc(sizeof(priv_chunk_t));
+	private = galloc(sizeof(priv_chunk_t));
 	public = &private->public;
 
 	private->size = size;
-	private->data = malloc(size);
+	private->data = galloc(size);
 	if(data)
 		memcpy(private->data, data, size);
 

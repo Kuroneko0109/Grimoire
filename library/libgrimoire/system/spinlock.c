@@ -1,4 +1,5 @@
 #include <libgrimoire/system/spinlock.h>
+#include <libgrimoire/system/memory.h>
 
 #include <stdlib.h>
 #include <pthread.h>
@@ -34,7 +35,7 @@ lock_t * create_spinlock(void)
 	priv_spinlock_t * private;
 	lock_t * public;
 
-	private = malloc(sizeof(priv_spinlock_t));
+	private = galloc(sizeof(priv_spinlock_t));
 	public = &private->public;
 
 	pthread_spin_init(&private->lock, 0);

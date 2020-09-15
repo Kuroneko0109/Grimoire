@@ -1,4 +1,5 @@
 #include <libgrimoire/system/file.h>
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/system/lock.h>
 #include <string.h>
 #include <memory.h>
@@ -146,7 +147,7 @@ file_t * create_file(const char * path)
 	priv_file_t * private;
 	file_t * public;
 
-	private = malloc(sizeof(priv_file_t));
+	private = galloc(sizeof(priv_file_t));
 	public = &private->public;
 	memset(private, 0, sizeof(priv_file_t));
 

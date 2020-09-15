@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include <libgrimoire/system/memory.h>
 #include <libgrimoire/datastructure/node.h>
 
 typedef struct priv_node priv_node_t;
@@ -84,7 +85,7 @@ node_t * create_node(void * data, void * (*destroyer)(void *))
 	priv_node_t * priv;
 	node_t * public;
 
-	priv = malloc(sizeof(priv_node_t));
+	priv = galloc(sizeof(priv_node_t));
 	public = &priv->public;
 
 	public->set_data = node_set_data;
