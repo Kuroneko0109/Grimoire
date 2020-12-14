@@ -1,7 +1,10 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include <libgrimoire/db/db.h>
 #include <libgrimoire/datastructure/list.h>
 
-#include <mysql.h>
+#include <mysql/mysql.h>
 
 typedef struct priv_db priv_db_t;
 struct priv_db {
@@ -17,7 +20,7 @@ struct priv_db {
 	MYSQL * conn;
 };
 
-int db_query(db_t * this, char * query)
+int db_query(db_t * this, const char * query)
 {
 	priv_db_t * priv = (priv_db_t *)this;
 	int query_size = strlen(query) + 1;
@@ -36,14 +39,26 @@ int db_execute(db_t * this)
 	priv_db_t * priv = (priv_db_t *)this;
 	char * data;
 	int counter = 0;
+	int query_ret = 0;
+
+	if(NULL == priv->conn)
+		return -1;
 
 	priv->query_queue->lock(priv->query_queue);
 	while((data = priv->query_queue->dequeue_data(priv->query_queue)))
 	{
-		mysql_query()
+		priv->query_queue->unlock(priv->query_queue);
+		if(NULL == data)
+			goto end;
+		do {
+			query_ret = mysql_query(priv->conn, data);
+			if(0 != query_ret)
+			{
+			}
+		} while(0);
+		counter++;
 	}
-	priv->query_queue->unlock(priv->query_queue);
-
+end :
 	return counter;
 }
 
@@ -67,7 +82,6 @@ void db_set_conn_info(db_t * this, const char * ip, unsigned int port, const cha
 int db_connect(db_t * this)
 {
 	priv_db_t * priv = (priv_db_t *)this;
-	int res;
 	priv->conn = mysql_init(NULL);
 	if(NULL == priv->conn)
 		return -1;
@@ -78,10 +92,26 @@ int db_connect(db_t * this)
 	return 0;
 }
 
+void db_disconnect(db_t * this)
+{
+	priv_db_t * priv = (priv_db_t *)this;
+	mysql_close(priv->conn);
+	priv->conn = NULL;
+}
+
 int get_error(db_t * this, char * dst)
 {
+	priv_db_t * priv = (priv_db_t *)this;
 	strcpy(dst, mysql_error(priv->conn));
 	return strlen(dst);
+}
+
+void db_destroy(db_t * this)
+{
+	priv_db_t * priv = (priv_db_t *)this;
+	if(priv->conn)
+		this->disconnect(this);
+	free(this);
 }
 
 db_t * create_db(void)
@@ -92,12 +122,13 @@ db_t * create_db(void)
 	private = malloc(sizeof(priv_db_t));
 	public = &private->public;
 
-	private->list = create_list(LOCK_MUTEX, NULL, NULL);
+	private->query_queue = create_list(LOCK_MUTEX, NULL, NULL);
 	private->conn = mysql_init(NULL);
 
 	public->query = db_query;
-	public->fquery = db_fquery;
+	//public->fquery = db_fquery;
 	public->connect = db_connect;
+	public->disconnect = db_disconnect;
 	public->set_conn_info = db_set_conn_info;
 	public->destroy = db_destroy;
 
