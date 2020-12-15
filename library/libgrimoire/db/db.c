@@ -86,7 +86,14 @@ int db_connect(db_t * this)
 	if(NULL == priv->conn)
 		return -1;
 
-	if(NULL == mysql_real_connect(priv->conn, priv->db_ip, priv->db_id, priv->db_pwd, priv->db_base, priv->db_port, NULL, 0))
+	if(NULL == mysql_real_connect(priv->conn,
+				priv->db_ip,
+				priv->db_id,
+				priv->db_pwd,
+				strlen(priv->db_base)?priv->db_base:NULL,
+				priv->db_port,
+				NULL,
+				0))
 		return -1;
 
 	return 0;
@@ -99,11 +106,12 @@ void db_disconnect(db_t * this)
 	priv->conn = NULL;
 }
 
-int get_error(db_t * this, char * dst)
+int db_get_error(db_t * this, char * dst)
 {
 	priv_db_t * priv = (priv_db_t *)this;
-	strcpy(dst, mysql_error(priv->conn));
-	return strlen(dst);
+	if(NULL != dst)
+		strcpy(dst, mysql_error(priv->conn));
+	return strlen(mysql_error(priv->conn));
 }
 
 void db_destroy(db_t * this)
@@ -127,6 +135,7 @@ db_t * create_db(void)
 
 	public->query = db_query;
 	//public->fquery = db_fquery;
+	public->get_error = db_get_error;
 	public->connect = db_connect;
 	public->disconnect = db_disconnect;
 	public->set_conn_info = db_set_conn_info;

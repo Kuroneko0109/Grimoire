@@ -6,6 +6,7 @@ struct db {
 	int (*query)(db_t *, const char *);
 	int (*fquery)(db_t *, const char *);
 	void (*set_conn_info)(db_t *, const char *, unsigned int, const char *, const char *, const char *);
+	int (*get_error)(db_t *, char *);
 	int (*connect)(db_t *);
 	void (*disconnect)(db_t *);
 	void (*destroy)(db_t *);

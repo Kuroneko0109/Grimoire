@@ -1,12 +1,12 @@
-OBJS = $(patsubst %c, %o, $(wildcard *.c))
+OBJS = $(patsubst %.c, %.o, $(wildcard *.c))
+
+all :	$(OBJS)
 
 .c.o :
-	@$(CC) $(CFLAGS) $< -o $@
-	@$(AR) rcs $(ARCHIVE) $@
-
-all : $(OBJS)
+	@$(CC) $(CFLAGS) -o $@ $<
+	@$(AR) rcs $(LIBRARY_ARCHIVE) $@
 
 clean :
 	@rm -f *.o
 
-.PHONY : all clean
+.PHONY: clean all
