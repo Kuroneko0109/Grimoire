@@ -10,17 +10,47 @@ typedef struct priv_db priv_db_t;
 struct priv_db {
 	db_t public;
 
+	lock_t * query_lock;
 	list_t * query_queue;
 
+	void (*real_query)(db_t *, const char *);
+
+	MYSQL * conn;
 	char db_ip[32];
 	unsigned int db_port;
 	char db_base[64];
 	char db_id[64];
 	char db_pwd[128];
-	MYSQL * conn;
 };
 
-int db_query(db_t * this, const char * query)
+void * db_real_query(db_t * this, const char * query, void * (*db_result_wrapper)(MYSQL_RES *))
+{
+	void * ret = NULL;
+	MYSQL_RES * res;
+
+	priv->query_lock->lock(priv->query_lock);
+	res = mysql_query(priv->conn, query);
+	priv->query_lock->unlock(priv->query_lock);
+
+	if(NULL == res)
+		return ret;
+
+	if(db_result_wrapper)
+		ret = db_result_wrapper(res);
+
+	mysql_free_result(res);
+
+	return ret;
+}
+
+int db_squery(db_t * this, const char * query, void * dst)
+{
+	priv_db_t * priv = (priv_db_t *)this;
+
+	priv->real_query();
+}
+
+int db_aquery(db_t * this, const char * query)
 {
 	priv_db_t * priv = (priv_db_t *)this;
 	int query_size = strlen(query) + 1;
@@ -34,7 +64,7 @@ int db_query(db_t * this, const char * query)
 	return 0;
 }
 
-int db_execute(db_t * this)
+int db_thread(db_t * this)
 {
 	priv_db_t * priv = (priv_db_t *)this;
 	char * data;
@@ -51,10 +81,12 @@ int db_execute(db_t * this)
 		if(NULL == data)
 			goto end;
 		do {
+			priv->query_lock->lock(priv->query_lock);
 			query_ret = mysql_query(priv->conn, data);
 			if(0 != query_ret)
 			{
 			}
+			priv->query_lock->unlock(priv->query_lock);
 		} while(0);
 		counter++;
 	}
@@ -130,11 +162,13 @@ db_t * create_db(void)
 	private = malloc(sizeof(priv_db_t));
 	public = &private->public;
 
+	private->query_lock = create_lock(LOCK_SPINLOCK);
 	private->query_queue = create_list(LOCK_MUTEX, NULL, NULL);
 	private->conn = mysql_init(NULL);
+	private->real_query = db_real_query;
 
-	public->query = db_query;
-	//public->fquery = db_fquery;
+	public->aquery = db_aquery;
+	public->squery = db_squery;
 	public->get_error = db_get_error;
 	public->connect = db_connect;
 	public->disconnect = db_disconnect;
