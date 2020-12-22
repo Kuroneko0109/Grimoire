@@ -13,7 +13,7 @@ struct priv_db {
 	lock_t * query_lock;
 	list_t * query_queue;
 
-	void (*real_query)(db_t *, const char *);
+	list_t * (*real_query)(db_t *, const char *, void * (*)(MYSQL_ROW));
 
 	MYSQL * conn;
 	char db_ip[32];
@@ -23,31 +23,51 @@ struct priv_db {
 	char db_pwd[128];
 };
 
-void * db_real_query(db_t * this, const char * query, void * (*db_result_wrapper)(MYSQL_RES *))
+list_t * db_real_query(db_t * this, const char * query, void * (*db_result_wrapper)(MYSQL_ROW))
 {
-	void * ret = NULL;
-	MYSQL_RES * res;
+	priv_db_t * priv = (priv_db_t *)this;
+	list_t * ret = NULL;
+	int res;
+	MYSQL_RES * result;
+	int rows_cnt;
+	MYSQL_ROW row;
+	void * data;
 
 	priv->query_lock->lock(priv->query_lock);
 	res = mysql_query(priv->conn, query);
 	priv->query_lock->unlock(priv->query_lock);
 
-	if(NULL == res)
-		return ret;
-
-	if(db_result_wrapper)
-		ret = db_result_wrapper(res);
-
-	mysql_free_result(res);
+	if(0 == res)
+	{
+		if(db_result_wrapper)
+		{
+			result = mysql_store_result(priv->conn);
+			ret = create_list(LOCK_SPINLOCK, NULL, NULL);
+			ret->lock(ret);
+			while((row = mysql_fetch_row(result)))
+			{
+				data = db_result_wrapper(row);
+				ret->enqueue_data(ret, data);
+			}
+			ret->unlock(ret);
+			mysql_free_result(res);
+		}
+	}
+	else
+	{
+		printf("Query failure(%s)\n", query);
+	}
 
 	return ret;
 }
 
-int db_squery(db_t * this, const char * query, void * dst)
+list_t * db_squery(db_t * this, const char * query, void * (*db_result_wrapper)(MYSQL_ROW))
 {
 	priv_db_t * priv = (priv_db_t *)this;
 
-	priv->real_query();
+	priv->real_query(this, query, db_result_wrapper);
+
+	return 0;
 }
 
 int db_aquery(db_t * this, const char * query)
@@ -64,34 +84,22 @@ int db_aquery(db_t * this, const char * query)
 	return 0;
 }
 
-int db_thread(db_t * this)
+void * db_thread(void * param)
 {
+	db_t * this = (db_t *)param;
 	priv_db_t * priv = (priv_db_t *)this;
-	char * data;
-	int counter = 0;
-	int query_ret = 0;
+	char * query;
 
 	if(NULL == priv->conn)
-		return -1;
+		return NULL;
 
 	priv->query_queue->lock(priv->query_queue);
-	while((data = priv->query_queue->dequeue_data(priv->query_queue)))
-	{
-		priv->query_queue->unlock(priv->query_queue);
-		if(NULL == data)
-			goto end;
-		do {
-			priv->query_lock->lock(priv->query_lock);
-			query_ret = mysql_query(priv->conn, data);
-			if(0 != query_ret)
-			{
-			}
-			priv->query_lock->unlock(priv->query_lock);
-		} while(0);
-		counter++;
-	}
-end :
-	return counter;
+	query = priv->query_queue->dequeue_data(priv->query_queue);
+	priv->query_queue->unlock(priv->query_queue);
+	priv->real_query(this, query, NULL);
+	free(query);
+
+	return NULL;
 }
 
 void db_set_conn_info(db_t * this, const char * ip, unsigned int port, const char * base, const char * id, const char * pwd)
