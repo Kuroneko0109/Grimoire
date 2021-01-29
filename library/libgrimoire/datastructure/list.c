@@ -375,7 +375,7 @@ void * list_method_default_merge(list_t * this)
 	size_t size = 0;
 
 	while((tmp = iter->next(iter)))
-		size += malloc_usage_size(tmp);
+		size += malloc_usable_size(tmp);
 
 	if(0 == size)
 		goto end;
@@ -387,8 +387,8 @@ void * list_method_default_merge(list_t * this)
 	ptr = ret;
 	while((tmp = iter->next(iter)))
 	{
-		memcpy(ptr, tmp, malloc_usage_size(tmp));
-		ptr += malloc_usage_size(tmp);
+		memcpy(ptr, tmp, malloc_usable_size(tmp));
+		ptr += malloc_usable_size(tmp);
 	}
 
 end :
