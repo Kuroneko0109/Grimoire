@@ -20,6 +20,7 @@ struct priv_list {
 	void (*method_sort)(iterator_t *, int (*)(void *, void *));
 	void * (*method_copy)(void *);
 	void * (*method_dump)(void *);
+	void * (*method_merge)(void *);
 
 	int (*method_likely)(list_t *, list_t *);
 
@@ -365,6 +366,42 @@ int list_likely(list_t * this, list_t * list_obj)
 	return ret;
 }
 
+void * list_method_default_merge(list_t * this)
+{
+	iterator_t * iter = this->get_iterator(this);
+	void * tmp;
+	void * ret;
+	uint8_t * ptr;
+	size_t size = 0;
+
+	while((tmp = iter->next(iter)))
+		size += _msize(tmp);
+
+	if(0 == size)
+		goto end;
+
+	ret = malloc(size);
+	if(NULL == ret)
+		goto end;
+
+	ptr = ret;
+	while((tmp = iter->next(iter)))
+	{
+		memcpy(ptr, tmp, _msize(tmp));
+		ptr += _msize(tmp);
+	}
+
+end :
+	iter->destroy(iter);
+	return ret;
+}
+
+void * list_merge(list_t * this)
+{
+	priv_list_t * priv = (priv_list_t *)this;
+	return priv->method_merge(this);
+}
+
 list_t * create_list(
 		int lock_mode,
 		void * (*method_destroyer)(void *),
@@ -382,6 +419,7 @@ list_t * create_list(
 	private->method_destroyer = method_destroyer;
 	private->method_copy = NULL;
 	private->method_sort = NULL;
+	private->method_merge = list_method_default_merge;
 	private->method_dump = method_dump;
 	private->lock = create_lock(lock_mode);
 	private->cache = NULL;
@@ -403,6 +441,7 @@ list_t * create_list(
 	public->unlock = list_unlock;
 	public->set_sort = list_set_sort;
 	public->sort = list_sort;
+	public->merge = list_merge;
 	public->foreach = list_foreach;
 	public->dump = list_dump;
 	public->flush = list_flush;

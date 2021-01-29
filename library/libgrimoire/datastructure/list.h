@@ -28,6 +28,8 @@ struct list {
 
 	void (*foreach)(list_t *, void * (*)(void *));
 
+	void * (*merge)(list_t *);
+
 	int (*lock)(list_t *);
 	int (*unlock)(list_t *);
 
