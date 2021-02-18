@@ -1,7 +1,7 @@
 #ifndef _DB_
 #define _DB_
 
-#include <mysql/mysql.h>
+#include <mariadb/mysql.h>
 #include <libgrimoire/datastructure/list.h>
 
 typedef struct db db_t;

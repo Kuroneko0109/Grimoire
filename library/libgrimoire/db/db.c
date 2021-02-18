@@ -4,8 +4,6 @@
 #include <libgrimoire/db/db.h>
 #include <libgrimoire/datastructure/list.h>
 
-#include <mysql/mysql.h>
-
 typedef struct priv_db priv_db_t;
 struct priv_db {
 	db_t public;
